@@ -32,8 +32,10 @@ origins = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
     "http://localhost:3000",
-    "http://localhost:5000",
+    "http://localhost:5000"
 ]
+
+# rodar o fluter com uma porta especifica se usar um browser, ex.: flutter run -d chrome --web-port 3000
 
 app.add_middleware(
     CORSMiddleware,
