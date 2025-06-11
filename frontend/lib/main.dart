@@ -5,6 +5,8 @@ import 'package:provider/provider.dart'; // Importe o Provider
 import 'package:gym_notes/services/auth_service.dart';
 import 'package:gym_notes/screens/auth/login_screen.dart';
 import 'package:gym_notes/screens/home_screen.dart'; // Tela principal após o login
+import 'package:gym_notes/screens/auth/register_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Garante que o Flutter Binding está inicializado
@@ -46,7 +48,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/home': (context) => HomeScreen(),
-        // '/register': (context) => RegisterScreen(), // Adicionaremos depois
+        '/register': (context) => RegisterScreen(), // Adicionaremos depois
       },
     );
   }

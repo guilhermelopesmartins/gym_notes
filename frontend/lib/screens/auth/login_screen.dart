@@ -128,11 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextButton(
                   onPressed: () {
                     // Navegar para a tela de registro
-                    // Navigator.of(context).pushNamed('/register');
-                    print('Navegar para tela de registro (ainda não implementada)');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Tela de registro ainda não implementada.')),
-                    );
+                    Navigator.of(context).pushNamed('/register');
                   },
                   child: Text(
                     'Não tem uma conta? Registre-se aqui.',

@@ -53,8 +53,13 @@ class AuthService extends ChangeNotifier {
   // --- Métodos de Autenticação e API ---
 
   // Método de Registro de Usuário
-  Future<User?> register(UserCreate userCreate) async {
+  Future<User?> register(String username, String email, String password) async {
     final uri = Uri.parse('$_baseUrl/auth/register');
+    final userCreate = UserCreate(
+      username: username,
+      email: email,
+      password: password,
+    );
     try {
       final response = await http.post(
         uri,
@@ -68,14 +73,14 @@ class AuthService extends ChangeNotifier {
       } else if (response.statusCode == 409) {
         // Conflito (usuário/email já existe)
         final errorBody = jsonDecode(response.body);
-        throw Exception(errorBody['detail'] ?? 'Registration failed: Conflict');
+        throw Exception(errorBody['detail'] ?? 'Nome de usuário ou email já em uso.');
       } else {
         // Outros erros
         final errorBody = jsonDecode(response.body);
-        throw Exception(errorBody['detail'] ?? 'Registration failed');
+        throw Exception(errorBody['detail'] ?? 'Falha no registro.');
       }
     } catch (e) {
-      print('Error during registration: $e');
+      print('Erro durante o registro: $e');
       rethrow; // Exception('Failed to connect to the server or process registration: $e');
     }
   }
@@ -97,8 +102,6 @@ class AuthService extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        print('Response bellow');
-        print('Response Body: ${response.body}');
         final tokenData = Token.fromJson(jsonDecode(response.body));
         // Após o login, queremos os detalhes completos do usuário logado
         // Fazemos uma requisição para /auth/me usando o token recém-obtido
