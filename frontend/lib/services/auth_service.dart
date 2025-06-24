@@ -20,14 +20,19 @@ class AuthService extends ChangeNotifier {
   String? get token => _token;
   String? get currentUserId => _currentUserId;
 
-  // --- Métodos de Leitura/Escrita de Token no SharedPreferences ---
+  AuthService() {
+    _loadTokenAndUser();
+  }
 
-  // Carrega o token JWT e o ID do usuário do armazenamento local
-  Future<void> loadToken() async {
+
+  // --- Métodos de Leitura/Escrita de Token no SharedPreferences ---
+  Future<void> _loadTokenAndUser() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString(_tokenKey);
     _currentUserId = prefs.getString(_userIdKey);
-    notifyListeners();
+    if (_token != null || _currentUserId != null) {
+      notifyListeners();
+    }
   }
 
   // Salva o token JWT e o ID do usuário no armazenamento local
@@ -41,7 +46,7 @@ class AuthService extends ChangeNotifier {
   }
 
   // Remove o token JWT e o ID do usuário do armazenamento local (logout)
-  Future<void> deleteToken() async {
+  Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_userIdKey);
@@ -141,10 +146,14 @@ class AuthService extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        return User.fromJson(jsonDecode(response.body));
+        final user = User.fromJson(jsonDecode(response.body));
+        if (_currentUserId == null || _currentUserId != user.id) {
+          _currentUserId = user.id;
+          notifyListeners();
+        }
+        return user;
       } else if (response.statusCode == 401) {
-        // Token inválido ou expirado, força logout
-        await deleteToken();
+        await logout();
         throw Exception('Authentication expired. Please log in again.');
       } else {
         final errorBody = jsonDecode(response.body);
@@ -176,7 +185,7 @@ class AuthService extends ChangeNotifier {
       if (response.statusCode == 200) {
         return User.fromJson(jsonDecode(response.body));
       } else if (response.statusCode == 401) {
-        await deleteToken();
+        await logout();
         throw Exception('Authentication expired. Please log in again.');
       } else if (response.statusCode == 409) {
          final errorBody = jsonDecode(response.body);

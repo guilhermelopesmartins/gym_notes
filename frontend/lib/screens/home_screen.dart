@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _logout() async {
     final authService = Provider.of<AuthService>(context, listen: false);
-    await authService.deleteToken();
+    await authService.logout();
     Navigator.of(context).pushReplacementNamed('/login');
   }
 

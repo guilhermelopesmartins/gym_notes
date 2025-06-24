@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (user != null) {
         // Login bem-sucedido, navega para a HomeScreen e remove a LoginScreen da pilha
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed('/training_blocks');
       }
     } catch (e) {
       // Trata erros de login (ex: credenciais inválidas)
