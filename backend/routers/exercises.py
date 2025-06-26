@@ -124,3 +124,21 @@ def delete_exercise(
     db.delete(db_exercise)
     db.commit()
     return {"message": "Exercise deleted successfully"} # Mensagem de sucesso (204 No Content não envia body)
+
+@router.get("/by_training_block/{training_block_id}", response_model=List[schemas_exercise.ExerciseInDB])
+def get_exercises_by_training_block(
+    training_block_id: str,
+    db: Session = Depends(get_db)
+):
+    # Assumindo que você tem uma tabela intermediária TrainingBlockExercise
+    # e um relacionamento que permite buscar os Exercises através dela
+    exercises = db.query(models_exercise.Exercise)\
+                  .join(models_exercise.TrainingBlockExercise)\
+                  .filter(models_exercise.TrainingBlockExercise.training_block_id == training_block_id)\
+                  .all()
+    if not exercises:
+        # Opcional: retornar 404 se o bloco não tiver exercícios ou o bloco não existir
+        # Mas geralmente uma lista vazia é aceitável se não houver exercícios
+        # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No exercises found for this training block or training block not found.")
+        pass
+    return exercises

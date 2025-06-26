@@ -6,6 +6,7 @@ import 'package:gym_notes/models/training_block.dart';
 import 'package:gym_notes/screens/training_blocks/training_block_form_screen.dart';
 import 'package:gym_notes/services/auth_service.dart';
 import 'package:gym_notes/screens/auth/login_screen.dart';
+import 'package:gym_notes/screens/training_blocks/training_block_detail_screen.dart';
 
 class TrainingBlocksListScreen extends StatefulWidget {
   const TrainingBlocksListScreen({super.key});
@@ -270,9 +271,16 @@ class TrainingBlockCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Clicado em ${block.title} (Implementar detalhes)')),
-          );
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TrainingBlockDetailScreen(block: block),
+            ),
+          ).then((value) {
+            // TODO: Se a tela de detalhes tiver alguma edição que afete a lista,
+            // você pode querer atualizar a lista aqui.
+            // Por exemplo, se um exercício é adicionado/removido e isso altera a "prévia" do bloco.
+            // Para mudanças no bloco em si (título/descrição), o `onEdit` já cuida.
+          });
         },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
