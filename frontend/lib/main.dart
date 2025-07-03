@@ -49,7 +49,101 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Gym Notes App',
       theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
+        // Remova todos os asteriscos daqui!
+        scaffoldBackgroundColor: Colors.black,
+
+        primaryColor: Colors.yellow[700],
+        colorScheme: ColorScheme.dark(
+          primary: Colors.yellow[700]!,
+          onPrimary: Colors.white,
+          secondary: Colors.yellow[400]!,
+          onSecondary: Colors.black,
+          surface: Colors.black,
+          onSurface: Colors.white,
+          background: Colors.black,
+          onBackground: Colors.white,
+          error: Colors.red,
+          onError: Colors.white,
+        ),
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.yellow[700],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.yellow[400],
+          ),
+        ),
+
+        cardTheme: CardTheme(
+          color: Colors.grey[900],
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: BorderSide(color: Colors.yellow[700]!, width: 1.5),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        ),
+
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(color: Colors.white),
+          displayMedium: TextStyle(color: Colors.white),
+          displaySmall: TextStyle(color: Colors.white),
+          headlineLarge: TextStyle(color: Colors.white),
+          headlineMedium: TextStyle(color: Colors.white),
+          headlineSmall: TextStyle(color: Colors.white),
+          titleLarge: TextStyle(color: Colors.white),
+          titleMedium: TextStyle(color: Colors.white),
+          titleSmall: TextStyle(color: Colors.white),
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
+          bodySmall: TextStyle(color: Colors.white),
+          labelLarge: TextStyle(color: Colors.white),
+          labelMedium: TextStyle(color: Colors.white),
+          labelSmall: TextStyle(color: Colors.white),
+        ),
+
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.grey[850],
+          hintStyle: TextStyle(color: Colors.grey[500]),
+          labelStyle: const TextStyle(color: Colors.white),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey[700]!, width: 1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.yellow[700]!, width: 2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.red, width: 2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.red, width: 2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.yellow[700],
+          foregroundColor: Colors.black,
+        ),
+
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // Decide qual tela mostrar com base no token existente
