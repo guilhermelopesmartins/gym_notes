@@ -1,8 +1,11 @@
 // lib/screens/auth/register_screen.dart
+import 'dart:io';
+import 'package:image_picker/image_picker.dart'; 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_notes/services/auth_service.dart';
-import 'package:gym_notes/screens/auth/login_screen.dart'; // Para redirecionar após o registro
+import 'package:gym_notes/screens/auth/login_screen.dart';
+import 'package:gym_notes/utils/constants.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -15,7 +18,70 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>(); // Chave para validação do formulário
+  final ImagePicker _picker = ImagePicker();
+  File? _profileImage; // Para armazenar o arquivo de imagem selecionado
   bool _isLoading = false; // Estado para mostrar indicador de carregamento
+
+  Future<void> _pickImage() async {
+  final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+
+  if (pickedFile != null) {
+    debugPrint('Caminho da imagem obtido pelo ImagePicker: ${pickedFile.path}');
+    try {
+      // Tenta criar o File
+      final tempFile = File(pickedFile.path);
+      // Verifica se o arquivo realmente existe no caminho
+      if (await tempFile.exists()) {
+        debugPrint('Arquivo temporário existe: ${tempFile.path}');
+        setState(() {
+          _profileImage = tempFile;
+        });
+      } else {
+        debugPrint('ERRO: Arquivo temporário NÃO existe no caminho: ${pickedFile.path}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erro: O arquivo da imagem não foi encontrado.')),
+        );
+      }
+    } catch (e) {
+      debugPrint('ERRO ao criar objeto File ou verificar existência: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao processar imagem: ${e.toString()}')),
+      );
+    }
+  } else {
+    debugPrint('Nenhuma imagem selecionada ou tirada.');
+  }
+}
+
+  Future<void> _submitRegistration() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        final authService = Provider.of<AuthService>(context, listen: false);
+        await authService.registerWithProfilePicture(
+          _usernameController.text,
+          _emailController.text,
+          _passwordController.text,
+          _profileImage,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registro bem-sucedido! Por favor, faça login.')),
+        );
+        Navigator.of(context).pushReplacementNamed('/login'); // Redireciona para o login
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro no registro: ${e.toString().replaceFirst('Exception: ', '')}')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
 
   @override
   void dispose() {
@@ -95,6 +161,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 40),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                    child: _profileImage == null
+                        ? Icon(Icons.camera_alt, size: 40, color: Colors.grey[600])
+                        : null,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextFormField(
                   controller: _usernameController,
                   decoration: InputDecoration(
@@ -170,7 +248,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _isLoading
                     ? Center(child: CircularProgressIndicator())
                     : ElevatedButton(
-                        onPressed: _register,
+                        onPressed: _submitRegistration,
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(

@@ -1,5 +1,6 @@
 // lib/screens/training_blocks/training_blocks_list_screen.dart
 import 'package:flutter/material.dart';
+import 'package:gym_notes/models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_notes/services/training_block_service.dart';
 import 'package:gym_notes/models/training_block.dart';
@@ -7,6 +8,7 @@ import 'package:gym_notes/screens/training_blocks/training_block_form_screen.dar
 import 'package:gym_notes/services/auth_service.dart';
 import 'package:gym_notes/screens/auth/login_screen.dart';
 import 'package:gym_notes/screens/training_blocks/training_block_detail_screen.dart';
+import 'package:gym_notes/utils/constants.dart';
 
 class TrainingBlocksListScreen extends StatefulWidget {
   const TrainingBlocksListScreen({super.key});
@@ -24,6 +26,7 @@ class _TrainingBlocksListScreenState extends State<TrainingBlocksListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchTrainingBlocks();
+      Provider.of<AuthService>(context, listen: false).getMe();
     });
   }
 
@@ -136,6 +139,40 @@ class _TrainingBlocksListScreenState extends State<TrainingBlocksListScreen> {
         title: const Text('Meus Blocos de Treino'),
         automaticallyImplyLeading: false,
         actions: [
+          Consumer<AuthService>( // Use Consumer para reagir a mudanças no AuthService
+            builder: (context, authService, child) {
+              final user = authService.currentUser;
+              if (user != null && user.profilePictureUrl != null) {
+                // Se a URL for um caminho relativo, adicione a base da URL do backend
+                final imageUrl = user.profilePictureUrl!.startsWith('http')
+                    ? user.profilePictureUrl!
+                    : '${Constants.BASE_URL}${user.profilePictureUrl!}'; // Certifique-se que Constants.BASE_URL é o seu IP/porta do backend
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(imageUrl),
+                    radius: 20,
+                    // Você pode adicionar um GestureDetector para ir para a tela de perfil
+                    child: GestureDetector(
+                      onTap: () {
+                        // Navegar para uma tela de perfil do usuário, se tiver
+                        // Navigator.of(context).pushNamed('/profile');
+                      },
+                    ),
+                  ),
+                );
+              } else {
+                // Placeholder se não houver foto de perfil
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.grey[300],
+                    child: const Icon(Icons.person, color: Colors.grey),
+                  ),
+                );
+              }
+            },
+          ),
           PopupMenuButton<MenuOption>(
             icon: const Icon(Icons.settings),
             onSelected: (MenuOption result) {

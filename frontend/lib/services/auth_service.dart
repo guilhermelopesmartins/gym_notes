@@ -1,5 +1,6 @@
 // lib/services/auth_service.dart
-import 'dart:convert'; // Para jsonEncode e jsonDecode
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; // Importa o pacote http
 import 'package:shared_preferences/shared_preferences.dart'; // Para armazenamento local
@@ -15,10 +16,12 @@ class AuthService extends ChangeNotifier {
 
   String? _token; // Armazena o token na memória para acesso rápido
   String? _currentUserId; // Armazena o ID do usuário na memória
+  User? _currentUser;
 
   // Getter para o token. Outras classes podem usá-lo.
   String? get token => _token;
   String? get currentUserId => _currentUserId;
+  User? get currentUser => _currentUser;
 
   AuthService() {
     _loadTokenAndUser();
@@ -133,7 +136,9 @@ class AuthService extends ChangeNotifier {
     // Usa o token passado como argumento ou o token armazenado
     final currentToken = specificToken ?? _token; 
     if (currentToken == null) {
-      throw Exception('No authentication token found.');
+      //throw Exception('No authentication token found.');
+      await logout();
+      return null;
     }
 
     final uri = Uri.parse('$_baseUrl/auth/me');
@@ -147,6 +152,7 @@ class AuthService extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final user = User.fromJson(jsonDecode(response.body));
+        _currentUser = user;
         if (_currentUserId == null || _currentUserId != user.id) {
           _currentUserId = user.id;
           notifyListeners();
@@ -199,5 +205,89 @@ class AuthService extends ChangeNotifier {
       print('Error updating user data: $e');
       throw Exception('Failed to connect to the server or update user data: $e');
     }
+  }
+  
+  // Retorna a URL da imagem no backend ou null em caso de falha
+  Future<String?> uploadProfilePicture(File imageFile) async {
+    final uri = Uri.parse('$_baseUrl/auth/upload_profile_picture');
+    try {
+      var request = http.MultipartRequest('POST', uri)
+        ..files.add(await http.MultipartFile.fromPath(
+          'file', // O nome do campo do formulário no backend (definido em @router.post("/upload_profile_picture") como `file: UploadFile = File(...)`)
+          imageFile.path,
+        ));
+
+      var response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(respStr);
+        final String? imageUrl = responseData['url']; // URL relativa do backend
+        if (imageUrl != null) {
+          // Construir a URL completa para ser salva no banco de dados e usada pelo frontend
+          return '$_baseUrl$imageUrl';
+        }
+        return null;
+      } else {
+        print('Erro no upload da imagem: ${response.statusCode} - $respStr');
+        throw Exception('Falha ao fazer upload da imagem: ${jsonDecode(respStr)['detail'] ?? 'Erro desconhecido'}');
+      }
+    } catch (e) {
+      print('Exceção durante o upload da imagem: $e');
+      rethrow;
+    }
+  }
+
+  Future<User?> registerWithProfilePicture(
+    String username, String email, String password, File? profilePicture) async {
+    String? profilePictureUrl;
+
+    if (profilePicture != null) {
+      try {
+        profilePictureUrl = await uploadProfilePicture(profilePicture);
+        if (profilePictureUrl == null) {
+          throw Exception("Falha ao carregar a imagem de perfil.");
+        }
+      } catch (e) {
+        print('Erro ao carregar imagem para registro: $e');
+        rethrow; // Rejoga a exceção para que a UI possa lidar com ela
+      }
+    }
+
+    final uri = Uri.parse('$_baseUrl/auth/register');
+    final userCreate = UserCreate(
+      username: username,
+      email: email,
+      password: password,
+      profilePictureUrl: profilePictureUrl, // Passa a URL obtida do upload
+    );
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(userCreate.toJson()),
+      );
+
+      if (response.statusCode == 201) {
+        final registeredUser = User.fromJson(jsonDecode(response.body));
+        // Opcional: Logar o usuário automaticamente após o registro bem-sucedido
+        // await login(username, password); 
+        return registeredUser;
+      } else if (response.statusCode == 409) {
+        final errorBody = jsonDecode(response.body);
+        throw Exception(errorBody['detail'] ?? 'Nome de usuário ou email já em uso.');
+      } else {
+        final errorBody = jsonDecode(response.body);
+        throw Exception(errorBody['detail'] ?? 'Falha no registro.');
+      }
+    } catch (e) {
+      print('Erro durante o registro: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> refreshCurrentUser() async {
+    await getMe();
   }
 }

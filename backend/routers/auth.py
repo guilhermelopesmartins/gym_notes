@@ -127,13 +127,13 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 @router.post("/upload_profile_picture")
 async def upload_profile_picture(file: UploadFile = File(...)):
-    # Validação básica de tipo de arquivo
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image.")
-
     # Gera um nome de arquivo único
     file_extension = file.filename.split(".")[-1] if "." in file.filename else "jpg"
-    unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    allowed_extensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp"]
+    if not file.content_type.startswith("image/") and file_extension not in allowed_extensions:
+        raise HTTPException(status_code=400, detail="File must be a supported image type.")
+    
+    unique_filename = f"{uuid.uuid4()}.{file_extension if file_extension else 'jpg'}"
     file_path = os.path.join(UPLOAD_DIRECTORY, unique_filename)
 
     # Salva o arquivo
@@ -141,7 +141,4 @@ async def upload_profile_picture(file: UploadFile = File(...)):
         content = await file.read()
         buffer.write(content)
 
-    # Retorna a URL de acesso à imagem (assumindo que 'static/' será servido publicamente)
-    # A URL real dependerá de como você configura o servidor web (Uvicorn, Nginx, etc.)
-    # Por exemplo, se seu FastAPI está em http://localhost:8000
     return {"filename": unique_filename, "url": f"/static/profile_pics/{unique_filename}"}

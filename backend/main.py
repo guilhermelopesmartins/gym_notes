@@ -11,6 +11,8 @@ from routers import training_block_exercises as tbe_router
 from routers import exercise_logs as exercise_logs_router
 from routers import auth as auth_router
 
+import os
+
 import models
 
 from database import engine, Base
@@ -24,6 +26,11 @@ app = FastAPI(
     docs_url="/documentation",
     redoc_url="/redoc"
 )
+
+UPLOAD_DIRECTORY = "static/profile_pics"
+os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 from fastapi.middleware.cors import CORSMiddleware
 
