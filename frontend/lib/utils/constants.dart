@@ -4,7 +4,7 @@ class Constants {
   // Para iOS Simulator, 'localhost' ou 127.0.0.1 funciona
   // Para testes no navegador Flutter Web, 'localhost' ou 127.0.0.1 funciona
   // Certifique-se que o backend FastAPI está rodando em http://localhost:8000
-  static const String BASE_URL = 'http://localhost:8000'; // 'http://127.0.0.1:8000';
+  static const String BASE_URL = 'http://10.0.2.2:8000'; // 'http://127.0.0.1:8000';
   // static const String BASE_URL = 'http://localhost:8000'; // Para iOS Simulator ou Web
   // static const String BASE_URL = 'http://192.168.1.100:8000'; // Para dispositivo físico (substitua pelo IP do seu PC)
 
