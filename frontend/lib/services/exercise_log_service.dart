@@ -12,7 +12,12 @@ class ExerciseLogService extends ChangeNotifier {
   final String _baseUrl = Constants.BASE_URL;
 
   List<ExerciseLog> _exerciseLogs = [];
+  String? _currentTrainingBlockId;
+  String? _currentExerciseId;
+
   List<ExerciseLog> get exerciseLogs => _exerciseLogs;
+  String? get currentTrainingBlockId => _currentTrainingBlockId;
+  String? get currentExerciseId => _currentExerciseId;
 
   Future<String?> _getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -46,8 +51,8 @@ class ExerciseLogService extends ChangeNotifier {
       if (logDate != null) {
         queryParams['log_date'] = logDate.toIso8601String().split('T')[0]; // Formato YYYY-MM-DD
       }
-
-      final uri = Uri.parse('$_baseUrl/exercise_logs/?trainingBlockId=$trainingBlockId&exerciseId=$exerciseId&logDate=$logDate&skip=$skip&limit=$limit');
+      final uri = Uri.parse('$_baseUrl/exercise_logs/')
+          .replace(queryParameters: queryParams);
       final response = await http.get(
         uri,
         headers: {
@@ -56,7 +61,7 @@ class ExerciseLogService extends ChangeNotifier {
       );
 
       // Usar ExerciseLogWithDetails se a API retornar os dados aninhados
-      _exerciseLogs = (response as List)
+      _exerciseLogs = (json.decode(response.body) as List)
           .map((json) => ExerciseLog.fromJson(json as Map<String, dynamic>))
           // Ou: .map((json) => ExerciseLogWithDetails.fromJson(json as Map<String, dynamic>))
           .toList();
@@ -65,6 +70,16 @@ class ExerciseLogService extends ChangeNotifier {
       debugPrint('Erro ao buscar logs de exercícios: $e');
       throw Exception('Erro ao buscar logs de exercícios: ${e.toString().replaceFirst('Exception: ', '')}');
     }
+  }
+
+  void setContextualLogIds({String? trainingBlockId, String? exerciseId}) {
+    _currentTrainingBlockId = trainingBlockId;
+    _currentExerciseId = exerciseId;
+  }
+
+  void clearContextualLogIds() {
+    _currentTrainingBlockId = null;
+    _currentExerciseId = null;
   }
 
   // Método para criar um novo log de exercício

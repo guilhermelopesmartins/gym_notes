@@ -6,6 +6,7 @@ import 'package:gym_notes/models/training_block_exercise.dart'; // Importe o mod
 import 'package:gym_notes/services/training_block_exercise_service.dart'; // Importe o novo serviço
 import 'package:gym_notes/screens/exercise_logs/add_edit_exercise_log_screen.dart'; // Para adicionar logs
 import 'package:gym_notes/screens/exercises/exercise_selection_screen.dart'; // Para selecionar exercícios para adicionar
+import 'package:gym_notes/services/exercise_log_service.dart';
 
 class TrainingBlockDetailScreen extends StatefulWidget {
   final TrainingBlock trainingBlock;
@@ -94,6 +95,7 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final exerciseLogService = Provider.of<ExerciseLogService>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.trainingBlock.title),
@@ -112,7 +114,7 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
                       itemCount: tbeService.blockExercises.length,
                       itemBuilder: (context, index) {
                         final tbe = tbeService.blockExercises[index];
-                        final exercise = tbe.exercise; // Acessando o Exercise aninhado
+                        final exercise = tbe.exercise;
 
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -151,16 +153,21 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.grey),
-                                  tooltip: 'Editar',
+                                  icon: const Icon(Icons.history),
                                   onPressed: () {
-                                    // Implementar edição do TBE (e.g., ordem, notas padrão)
-                                    // Você precisaria de uma tela AddEditTrainingBlockExerciseScreen
-                                    // para editar as propriedades de `tbe`
-                                    // Navigator.push(context, MaterialPageRoute(builder: (_) => EditTrainingBlockExerciseScreen(tbe: tbe)));
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Funcionalidade de edição a ser implementada.')),
-                                    );
+                                    if (exercise != null) {
+                                      // 1. Defina os IDs no serviço ANTES de navegar
+                                        exerciseLogService.setContextualLogIds(
+                                          trainingBlockId: widget.trainingBlock.id,
+                                          exerciseId:exercise.id,
+                                        );
+                                      // 2. Navegue para a tela de logs específica
+                                      Navigator.of(context).pushNamed('/exercise_logs_by_exercise');
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Exercício não encontrado para ver logs.')),
+                                      );
+                                    }
                                   },
                                 ),
                                 IconButton(
