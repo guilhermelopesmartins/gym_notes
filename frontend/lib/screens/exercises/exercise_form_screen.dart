@@ -17,8 +17,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _muscleGroupController = TextEditingController(); // NOVO
-  final _equipmentTypeController = TextEditingController(); // NOVO
+  final _categoryController = TextEditingController(); // NOVO
 
   bool _isLoading = false;
 
@@ -28,8 +27,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
     if (widget.exercise != null) {
       _nameController.text = widget.exercise!.name;
       _descriptionController.text = widget.exercise!.description ?? '';
-      _muscleGroupController.text = widget.exercise!.muscleGroup ?? '';
-      _equipmentTypeController.text = widget.exercise!.equipmentType ?? '';
+      _categoryController.text = widget.exercise!.category ?? '';
     }
   }
 
@@ -37,8 +35,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _muscleGroupController.dispose();
-    _equipmentTypeController.dispose();
+    _categoryController.dispose();
     super.dispose();
   }
 
@@ -59,8 +56,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
         final newExercise = ExerciseCreate(
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-          muscleGroup: _muscleGroupController.text.isEmpty ? null : _muscleGroupController.text,
-          equipmentType: _equipmentTypeController.text.isEmpty ? null : _equipmentTypeController.text,
+          category: _categoryController.text.isEmpty ? null : _categoryController.text,
         );
         await exerciseService.createExercise(newExercise);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,8 +67,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
         final updatedExercise = ExerciseUpdate(
           name: _nameController.text, // Assume que nome é sempre preenchido, mas verifique validação
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-          muscleGroup: _muscleGroupController.text.isEmpty ? null : _muscleGroupController.text,
-          equipmentType: _equipmentTypeController.text.isEmpty ? null : _equipmentTypeController.text,
+          category: _categoryController.text.isEmpty ? null : _categoryController.text,
         );
         await exerciseService.updateExercise(widget.exercise!.id, updatedExercise);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -130,7 +125,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _muscleGroupController,
+                controller: _categoryController,
                 decoration: const InputDecoration(
                   labelText: 'Grupo Muscular (Opcional)',
                   border: OutlineInputBorder(),
@@ -138,15 +133,6 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                controller: _equipmentTypeController,
-                decoration: const InputDecoration(
-                  labelText: 'Tipo de Equipamento (Opcional)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.sports_gymnastics),
-                ),
-              ),
-              const SizedBox(height: 24),
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(

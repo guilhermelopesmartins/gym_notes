@@ -54,6 +54,7 @@ def read_exercises(
         query = query.filter(models_exercise.Exercise.name.ilike(f"%{search}%")) # Busca parcial no nome
 
     exercises = query.offset(skip).limit(limit).all()
+    print(exercises)
     return exercises
 
 # --- Endpoint para Obter um Exercício por ID ---

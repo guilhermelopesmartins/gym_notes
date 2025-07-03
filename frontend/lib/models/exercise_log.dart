@@ -40,7 +40,7 @@ class ExerciseLog {
   @JsonKey(name: 'exercise_id')
   final String exerciseId;
   @JsonKey(name: 'user_id')
-  final String userId; // Adicionado para refletir a associação do backend
+  final String userId;
   @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
   final DateTime logDate;
   @JsonKey(name: 'sets_reps_data')
@@ -82,6 +82,8 @@ class ExerciseLogCreateUpdate {
   final String trainingBlockId;
   @JsonKey(name: 'exercise_id')
   final String exerciseId;
+  @JsonKey(name: 'user_id')
+  final String userId;
   @JsonKey(name: 'log_date', fromJson: _dateFromJson, toJson: _dateToJson)
   final DateTime logDate;
   @JsonKey(name: 'sets_reps_data')
@@ -91,6 +93,7 @@ class ExerciseLogCreateUpdate {
   ExerciseLogCreateUpdate({
     required this.trainingBlockId,
     required this.exerciseId,
+    required this.userId,
     required this.logDate,
     required this.setsRepsData,
     this.notes,

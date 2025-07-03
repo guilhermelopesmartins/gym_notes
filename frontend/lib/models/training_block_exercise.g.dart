@@ -73,13 +73,18 @@ TrainingBlockExerciseWithDetails _$TrainingBlockExerciseWithDetailsFromJson(
   trainingBlockId: json['training_block_id'] as String,
   exerciseId: json['exercise_id'] as String,
   orderInBlock: (json['order_in_block'] as num).toInt(),
-  notes: json['notes'] as String?,
   createdAt: DateTime.parse(json['created_at'] as String),
   updatedAt: DateTime.parse(json['updated_at'] as String),
-  exercise: Exercise.fromJson(json['exercise'] as Map<String, dynamic>),
-  trainingBlock: TrainingBlock.fromJson(
-    json['training_block'] as Map<String, dynamic>,
-  ),
+  exercise:
+      json['exercise'] == null
+          ? null
+          : Exercise.fromJson(json['exercise'] as Map<String, dynamic>),
+  trainingBlock:
+      json['training_block'] == null
+          ? null
+          : TrainingBlock.fromJson(
+            json['training_block'] as Map<String, dynamic>,
+          ),
 );
 
 Map<String, dynamic> _$TrainingBlockExerciseWithDetailsToJson(
@@ -89,7 +94,6 @@ Map<String, dynamic> _$TrainingBlockExerciseWithDetailsToJson(
   'training_block_id': instance.trainingBlockId,
   'exercise_id': instance.exerciseId,
   'order_in_block': instance.orderInBlock,
-  'notes': instance.notes,
   'created_at': instance.createdAt.toIso8601String(),
   'updated_at': instance.updatedAt.toIso8601String(),
   'exercise': instance.exercise,

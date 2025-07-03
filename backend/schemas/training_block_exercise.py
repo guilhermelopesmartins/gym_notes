@@ -10,16 +10,12 @@ class TrainingBlockExerciseBase(BaseModel):
     training_block_id: UUID4
     exercise_id: UUID4
     order_in_block: int = Field(0, ge=0) # ge=0 significa "maior ou igual a 0"
-    default_sets_reps: Optional[str] = Field(None, max_length=50)
-    default_notes: Optional[str] = None
 
 class TrainingBlockExerciseCreate(TrainingBlockExerciseBase):
     pass
 
 class TrainingBlockExerciseUpdate(BaseModel):
     order_in_block: Optional[int] = Field(None, ge=0)
-    default_sets_reps: Optional[str] = Field(None, max_length=50)
-    default_notes: Optional[str] = None
 
 class TrainingBlockExerciseInDB(TrainingBlockExerciseBase):
     id: UUID4

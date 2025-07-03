@@ -20,30 +20,95 @@ class ExerciseService extends ChangeNotifier {
   }
 
   // Método para buscar todas as definições de exercícios
-  Future<void> fetchExercises({int skip = 0, int limit = 100, String? category, String? search}) async {
+ Future<void> fetchExercises({
+    int skip = 0,
+    int limit = 100,
+    String? category, // Deixe nullable se o backend permitir, ajuste o uso
+    String? search,   // Deixe nullable
+  }) async {
+    try {
+      final token = await _getAccessToken();
+      if (token == null) {
+        throw Exception("Usuário não autenticado. Token JWT ausente.");
+      }
+
+      // Construa a URI com parâmetros de consulta corretamente
+      final Map<String, dynamic> queryParams = {
+        'skip': skip.toString(),
+        'limit': limit.toString(),
+      };
+      if (category != null && category.isNotEmpty) {
+        queryParams['category'] = category;
+      }
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+
+      final uri = Uri.parse('$_baseUrl/exercises/')
+          .replace(queryParameters: queryParams);
+
+      debugPrint('Fetching exercises from: $uri'); // Para depuração
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json', // Adicionar Content-Type
+        },
+      );
+
+      debugPrint('Status Code: ${response.statusCode}'); // Para depuração
+      debugPrint('Response Body: ${response.body}'); // Para depuração
+
+      if (response.statusCode == 200) {
+        // CORREÇÃO CRUCIAL AQUI: Decodifique o corpo da resposta JSON
+        _exercises = (json.decode(response.body) as List)
+            .map((json) => Exercise.fromJson(json as Map<String, dynamic>))
+            .toList();
+        notifyListeners();
+      } else {
+        // Trate erros HTTP, incluindo mensagens do backend
+        final errorData = json.decode(response.body);
+        final errorMessage = errorData['detail'] ?? 'Falha ao carregar exercícios.';
+        throw Exception('Erro HTTP ${response.statusCode}: $errorMessage');
+      }
+    } catch (e) {
+      debugPrint('Erro no fetchExercises: $e'); // Log completo do erro Dart
+      throw Exception('Erro ao buscar exercícios: ${e.toString().replaceFirst('Exception: ', '')}');
+    }
+  }
+
+   Future<void> fetchExercisesByTrainingBlock(String trainingBlockId) async {
     try {
       final token = await _getAccessToken();
       if (token == null) {
         throw Exception("Usuário não autenticado.");
       }
-
-      final uri = Uri.parse('$_baseUrl/exercises/?skip=$skip&limit=$limit&category=$category&search=$search');
+      final uri = Uri.parse('$_baseUrl/exercises/by_training_block/$trainingBlockId');
       final response = await http.get(
         uri,
         headers: {
           'Authorization': 'Bearer $token',
         },
       );
+      
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
 
-      _exercises = (response as List)
-          .map((json) => Exercise.fromJson(json as Map<String, dynamic>))
-          .toList();
-      notifyListeners();
+      if (response.statusCode == 200) {
+        _exercises = (json.decode(response.body) as List)
+            .map((json) => Exercise.fromJson(json as Map<String, dynamic>))
+            .toList();
+        notifyListeners();
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['detail'] ?? 'Falha ao carregar exercícios por bloco de treino.');
+      }
     } catch (e) {
-      debugPrint('Erro ao buscar exercícios: $e');
-      throw Exception('Erro ao buscar exercícios: ${e.toString().replaceFirst('Exception: ', '')}');
+      debugPrint('Erro ao buscar exercícios por bloco de treino: $e');
+      throw Exception('Erro ao buscar exercícios por bloco de treino: ${e.toString().replaceFirst('Exception: ', '')}');
     }
   }
+
 
   // Método para criar uma nova definição de exercício
   Future<Exercise> createExercise(ExerciseCreate exerciseCreate) async {
@@ -62,10 +127,17 @@ class ExerciseService extends ChangeNotifier {
         },
         body: jsonEncode( exerciseCreate.toJson()),
       );
-      final newExercise = Exercise.fromJson(response as Map<String, dynamic>);
-      _exercises.add(newExercise); // Adiciona ao cache local
-      notifyListeners();
-      return newExercise;
+      if (response.statusCode == 201) { // Verifique o status code antes de decodificar
+        final Map<String, dynamic> responseBodyMap = jsonDecode(response.body) as Map<String, dynamic>;
+        final newExercise = Exercise.fromJson(responseBodyMap);
+        _exercises.add(newExercise); // Adiciona ao cache local
+        notifyListeners();
+        return newExercise;
+      } else {
+        // Tratar erros do backend (ex: 409 Conflict)
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['detail'] ?? 'Falha ao criar exercício');
+      }
     } catch (e) {
       debugPrint('Erro ao criar exercício: $e');
       throw Exception('Erro ao criar exercício: ${e.toString().replaceFirst('Exception: ', '')}');

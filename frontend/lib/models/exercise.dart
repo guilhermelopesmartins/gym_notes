@@ -9,10 +9,8 @@ class Exercise {
   final String id;
   final String name;
   final String? description;
-  @JsonKey(name: 'muscle_group')
-  final String? muscleGroup;
-  @JsonKey(name: 'equipment_type')
-  final String? equipmentType;
+  @JsonKey(name: 'category')
+  final String category;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @JsonKey(name: 'updated_at')
@@ -22,8 +20,7 @@ class Exercise {
     required this.id,
     required this.name,
     this.description,
-    this.muscleGroup,
-    this.equipmentType,
+    required this.category,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -40,16 +37,13 @@ class Exercise {
 class ExerciseCreate {
   final String name;
   final String? description;
-  @JsonKey(name: 'muscle_group')
-  final String? muscleGroup;
-  @JsonKey(name: 'equipment_type')
-  final String? equipmentType;
+  @JsonKey(name: 'category')
+  final String? category;
 
   ExerciseCreate({
     required this.name,
     this.description,
-    this.muscleGroup,
-    this.equipmentType,
+    this.category,
   });
 
   factory ExerciseCreate.fromJson(Map<String, dynamic> json) => _$ExerciseCreateFromJson(json);
@@ -61,16 +55,13 @@ class ExerciseCreate {
 class ExerciseUpdate {
   final String? name;
   final String? description;
-  @JsonKey(name: 'muscle_group')
-  final String? muscleGroup;
-  @JsonKey(name: 'equipment_type')
-  final String? equipmentType;
+  @JsonKey(name: 'category')
+  final String? category;
 
   ExerciseUpdate({
     this.name,
     this.description,
-    this.muscleGroup,
-    this.equipmentType,
+    this.category,
   });
 
   factory ExerciseUpdate.fromJson(Map<String, dynamic> json) => _$ExerciseUpdateFromJson(json);

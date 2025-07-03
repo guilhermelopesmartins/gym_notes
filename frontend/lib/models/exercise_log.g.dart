@@ -29,7 +29,7 @@ ExerciseLog _$ExerciseLogFromJson(Map<String, dynamic> json) => ExerciseLog(
   trainingBlockId: json['training_block_id'] as String,
   exerciseId: json['exercise_id'] as String,
   userId: json['user_id'] as String,
-  logDate: ExerciseLog._dateFromJson(json['logDate'] as String),
+  logDate: ExerciseLog._dateFromJson(json['log_date'] as String),
   setsRepsData:
       (json['sets_reps_data'] as List<dynamic>)
           .map((e) => SetData.fromJson(e as Map<String, dynamic>))
@@ -45,7 +45,7 @@ Map<String, dynamic> _$ExerciseLogToJson(ExerciseLog instance) =>
       'training_block_id': instance.trainingBlockId,
       'exercise_id': instance.exerciseId,
       'user_id': instance.userId,
-      'logDate': ExerciseLog._dateToJson(instance.logDate),
+      'log_date': ExerciseLog._dateToJson(instance.logDate),
       'sets_reps_data': instance.setsRepsData,
       'notes': instance.notes,
       'created_at': instance.createdAt.toIso8601String(),
@@ -57,6 +57,7 @@ ExerciseLogCreateUpdate _$ExerciseLogCreateUpdateFromJson(
 ) => ExerciseLogCreateUpdate(
   trainingBlockId: json['training_block_id'] as String,
   exerciseId: json['exercise_id'] as String,
+  userId: json['user_id'] as String,
   logDate: ExerciseLogCreateUpdate._dateFromJson(json['log_date'] as String),
   setsRepsData:
       (json['sets_reps_data'] as List<dynamic>)
@@ -70,6 +71,7 @@ Map<String, dynamic> _$ExerciseLogCreateUpdateToJson(
 ) => <String, dynamic>{
   'training_block_id': instance.trainingBlockId,
   'exercise_id': instance.exerciseId,
+  'user_id': instance.userId,
   'log_date': ExerciseLogCreateUpdate._dateToJson(instance.logDate),
   'sets_reps_data': instance.setsRepsData,
   'notes': instance.notes,
@@ -82,7 +84,7 @@ ExerciseLogWithDetails _$ExerciseLogWithDetailsFromJson(
   trainingBlockId: json['training_block_id'] as String,
   exerciseId: json['exercise_id'] as String,
   userId: json['user_id'] as String,
-  logDate: ExerciseLog._dateFromJson(json['logDate'] as String),
+  logDate: ExerciseLog._dateFromJson(json['log_date'] as String),
   setsRepsData:
       (json['sets_reps_data'] as List<dynamic>)
           .map((e) => SetData.fromJson(e as Map<String, dynamic>))
@@ -104,7 +106,7 @@ Map<String, dynamic> _$ExerciseLogWithDetailsToJson(
   'training_block_id': instance.trainingBlockId,
   'exercise_id': instance.exerciseId,
   'user_id': instance.userId,
-  'logDate': ExerciseLog._dateToJson(instance.logDate),
+  'log_date': ExerciseLog._dateToJson(instance.logDate),
   'sets_reps_data': instance.setsRepsData,
   'notes': instance.notes,
   'created_at': instance.createdAt.toIso8601String(),

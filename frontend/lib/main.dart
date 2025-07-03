@@ -9,6 +9,7 @@ import 'package:gym_notes/screens/auth/login_screen.dart';
 import 'package:gym_notes/screens/home_screen.dart'; // Tela principal após o login
 import 'package:gym_notes/screens/auth/register_screen.dart';
 import 'package:gym_notes/services/training_block_service.dart';
+import 'package:gym_notes/services/training_block_exercise_service.dart';
 import 'package:gym_notes/services/exercise_service.dart';
 import 'package:gym_notes/services/exercise_log_service.dart';
 import 'package:gym_notes/screens/training_blocks/training_blocks_list_screen.dart'; // NOVO IMPORT
@@ -25,7 +26,8 @@ void main() async {
         ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => TrainingBlockService()),
         ChangeNotifierProvider(create: (context) => ExerciseService()),
-        ChangeNotifierProvider(create: (context) => ExerciseLogService())
+        ChangeNotifierProvider(create: (context) => ExerciseLogService()),
+        ChangeNotifierProvider(create: (context) => TrainingBlockExerciseService())
       ],
       child: MyApp(),
     ),

@@ -273,7 +273,7 @@ class TrainingBlockCard extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => TrainingBlockDetailScreen(block: block),
+              builder: (context) => TrainingBlockDetailScreen(trainingBlock: block),
             ),
           ).then((value) {
             // TODO: Se a tela de detalhes tiver alguma edição que afete a lista,

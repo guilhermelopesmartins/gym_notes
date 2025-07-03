@@ -90,26 +90,24 @@ class TrainingBlockExerciseUpdate {
 // Lembre-se de importar os modelos correspondentes (Exercise, TrainingBlock).
 @JsonSerializable()
 class TrainingBlockExerciseWithDetails extends TrainingBlockExercise {
-  final Exercise exercise; // Detalhes completos do exercício
+  final Exercise? exercise; // Detalhes completos do exercício
   @JsonKey(name: 'training_block')
-  final TrainingBlock trainingBlock; // Detalhes completos do bloco de treino
+  final TrainingBlock? trainingBlock; // Detalhes completos do bloco de treino
 
   TrainingBlockExerciseWithDetails({
     required String id,
     required String trainingBlockId,
     required String exerciseId,
     required int orderInBlock,
-    String? notes,
     required DateTime createdAt,
     required DateTime updatedAt,
-    required this.exercise,
-    required this.trainingBlock,
+    this.exercise,
+    this.trainingBlock,
   }) : super(
           id: id,
           trainingBlockId: trainingBlockId,
           exerciseId: exerciseId,
           orderInBlock: orderInBlock,
-          notes: notes,
           createdAt: createdAt,
           updatedAt: updatedAt,
         );

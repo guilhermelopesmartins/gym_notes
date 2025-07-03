@@ -1,404 +1,218 @@
 // lib/screens/training_blocks/training_block_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:gym_notes/models/training_block.dart';
-import 'package:gym_notes/models/exercise.dart'; // Importa o modelo de Exercício
-import 'package:gym_notes/services/training_block_service.dart'; // Para acessar o bloco, se necessário, ou atualizar a lista
-import 'package:gym_notes/screens/training_blocks/training_block_form_screen.dart'; // Para editar
-import 'package:gym_notes/screens/exercises/exercise_form_screen.dart'; // Ainda vamos criar esta tela (para adicionar/editar exercícios)
-import 'package:gym_notes/screens/exercise_logs/exercise_log_form_screen.dart';
-import 'package:gym_notes/screens/exercise_logs/exercise_logs_list_screen.dart';
-
+import 'package:gym_notes/models/training_block.dart'; // Importe seu modelo TrainingBlock
+import 'package:gym_notes/models/training_block_exercise.dart'; // Importe o modelo TrainingBlockExercise
+import 'package:gym_notes/services/training_block_exercise_service.dart'; // Importe o novo serviço
+import 'package:gym_notes/screens/exercise_logs/add_edit_exercise_log_screen.dart'; // Para adicionar logs
+import 'package:gym_notes/screens/exercises/exercise_selection_screen.dart'; // Para selecionar exercícios para adicionar
 
 class TrainingBlockDetailScreen extends StatefulWidget {
-  final TrainingBlock block;
+  final TrainingBlock trainingBlock;
 
-  const TrainingBlockDetailScreen({super.key, required this.block});
+  const TrainingBlockDetailScreen({super.key, required this.trainingBlock});
 
   @override
   State<TrainingBlockDetailScreen> createState() => _TrainingBlockDetailScreenState();
 }
 
 class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
-  // Poderíamos carregar exercícios aqui se tivéssemos um ExerciseService
-  // Por enquanto, vamos mockar alguns exercícios para demonstração.
-  List<Exercise> _exercisesInBlock = [];
-  bool _isLoadingExercises = true;
-  String? _exercisesErrorMessage;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _fetchExercisesForBlock();
+    // Carrega os exercícios do bloco quando a tela é inicializada
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadTrainingBlockExercises();
+    });
   }
 
-  Future<void> _fetchExercisesForBlock() async {
+  Future<void> _loadTrainingBlockExercises() async {
     setState(() {
-      _isLoadingExercises = true;
-      _exercisesErrorMessage = null;
+      _isLoading = true;
+      _errorMessage = null;
     });
     try {
-      // TODO: Use o endpoint do backend /exercises/by_training_block/{id}
-      // e um método correspondente no ExerciseService.
-      // Por agora, vou simular um fetch com mock data.
-      // Exemplo real:
-      // await Provider.of<ExerciseService>(context, listen: false).fetchExercisesByTrainingBlock(widget.block.id);
-      // _exercisesInBlock = Provider.of<ExerciseService>(context, listen: false).exercises; // Se o serviço gerenciar o estado da lista
-
-      // Simula o fetch e mocka alguns dados de DEFINIÇÃO de exercícios
-      await Future.delayed(const Duration(seconds: 1));
-      setState(() {
-        _exercisesInBlock = [
-          Exercise(
-            id: 'ex1_mock_id',
-            name: 'Supino Reto',
-            description: 'Exercício fundamental para peito.',
-            muscleGroup: 'Peito',
-            equipmentType: 'Barra',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-          Exercise(
-            id: 'ex2_mock_id',
-            name: 'Remada Curvada',
-            description: 'Exercício para as costas.',
-            muscleGroup: 'Costas',
-            equipmentType: 'Barra',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-          Exercise(
-            id: 'ex3_mock_id',
-            name: 'Agachamento Livre',
-            description: 'Exercício composto para pernas e glúteos.',
-            muscleGroup: 'Pernas',
-            equipmentType: 'Barra',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        ];
-      });
+      await Provider.of<TrainingBlockExerciseService>(context, listen: false)
+          .fetchTrainingBlockExercises(widget.trainingBlock.id);
     } catch (e) {
       setState(() {
-        _exercisesErrorMessage = 'Erro ao carregar exercícios: ${e.toString().replaceFirst('Exception: ', '')}';
+        _errorMessage = e.toString();
       });
+      if (mounted) { // Verifica se o widget ainda está montado antes de mostrar o SnackBar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar exercícios do bloco: ${e.toString().replaceFirst('Exception: ', '')}')),
+        );
+      }
     } finally {
       setState(() {
-        _isLoadingExercises = false;
+        _isLoading = false;
       });
     }
   }
 
-  // Método para editar o bloco de treino
-  void _editTrainingBlock() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => TrainingBlockFormScreen(block: widget.block),
-      ),
-    );
-    // Após a edição, pode ser necessário recarregar os detalhes do bloco
-    // se eles forem dinâmicos e dependessem do widget.block inicial, ou
-    // se o provider de TrainingBlockService já notifica.
-    // Para simplificar, assumimos que o provider cuida.
-  }
-
-
-  // Método para adicionar um novo exercício
-  void _addNewExerciseDefinition() async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ExerciseFormScreen(), // Não passa o bloco_id aqui
-      ),
-    );
-    if (result == true) {
-      // Se uma nova DEFINIÇÃO foi criada, você pode querer recarregar a lista
-      // ou ter uma lógica para associar o novo exercício ao bloco.
-      // No seu backend, essa associação é via TrainingBlockExercise.
-      // Por enquanto, vamos apenas recarregar as definições, mas a associação
-      // ao bloco é uma etapa extra (que viria de um form de "adicionar exercício ao bloco").
-      _fetchExercisesForBlock(); // Recarrega as definições de exercícios
-    }
-  }
-
-  void _addExerciseLog(Exercise exercise) async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ExerciseLogFormScreen(
-          trainingBlockId: widget.block.id,
-          exerciseId: exercise.id,
-          exerciseName: exercise.name, // Passa o nome para exibir no form
-        ),
-      ),
-    );
-    if (result == true) {
-      // Se um novo log foi adicionado, pode-se querer atualizar algo,
-      // como uma prévia do último treino na ExerciseDefinitionCard.
-      // Por agora, apenas um SnackBar.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Novo log para ${exercise.name} registrado!')),
+  Future<void> _addExerciseToBlock(String exerciseId) async {
+    try {
+      final tbeCreate = TrainingBlockExerciseCreate(
+        trainingBlockId: widget.trainingBlock.id,
+        exerciseId: exerciseId,
+        orderInBlock: 0, // Defina uma ordem padrão ou implemente lógica para determinar a próxima ordem
+        notes: null,
       );
+      await Provider.of<TrainingBlockExerciseService>(context, listen: false)
+          .addExerciseToTrainingBlock(tbeCreate);
+      await _loadTrainingBlockExercises(); // Recarrega a lista para mostrar o novo exercício
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao adicionar exercício: ${e.toString().replaceFirst('Exception: ', '')}')),
+        );
+      }
     }
   }
 
-  // Método para ver todos os logs de um exercício específico
-  void _viewExerciseLogs(Exercise exercise) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ExerciseLogsListScreen(
-          trainingBlockId: widget.block.id,
-          exerciseId: exercise.id,
-          exerciseName: exercise.name,
-        ),
-      ),
-    );
+  Future<void> _deleteTrainingBlockExercise(String tbeId) async {
+    try {
+      await Provider.of<TrainingBlockExerciseService>(context, listen: false)
+          .deleteTrainingBlockExercise(tbeId);
+      // A lista será atualizada automaticamente via notifyListeners() do service
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Exercício removido do bloco com sucesso!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao remover exercício: ${e.toString().replaceFirst('Exception: ', '')}')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final Color appBarColor = Color(int.parse(widget.block.colorHex.replaceFirst('#', '0xFF')));
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.block.title),
-        backgroundColor: appBarColor,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _editTrainingBlock,
-            tooltip: 'Editar Bloco',
-          ),
-          // Se você quiser um botão para adicionar uma NOVA DEFINIÇÃO de exercício globalmente:
-          // IconButton(
-          //   icon: const Icon(Icons.library_add),
-          //   onPressed: _addNewExerciseDefinition,
-          //   tooltip: 'Adicionar Nova Definição de Exercício',
-          // ),
-        ],
+        title: Text(widget.trainingBlock.title),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.block.title,
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: appBarColor),
-            ),
-            const SizedBox(height: 8),
-            if (widget.block.description != null && widget.block.description!.isNotEmpty) ...[
-              Text(
-                widget.block.description!,
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 16),
-            ],
-            Divider(color: Colors.grey[300]),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Exercícios neste Bloco:', // Mudei o texto
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Aqui você precisará de uma tela para "Adicionar Exercício Existente ao Bloco"
-                    // ou "Criar Novo Exercício E Adicionar ao Bloco".
-                    // Por enquanto, vamos para a tela de criar NOVA DEFINIÇÃO de exercício.
-                    _addNewExerciseDefinition(); // Chamando a função existente, mas pense no fluxo.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Funcionalidade de Adicionar Exercício ao Bloco (TODO)')),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage != null
+              ? Center(child: Text('Erro: $_errorMessage'))
+              : Consumer<TrainingBlockExerciseService>(
+                  builder: (context, tbeService, child) {
+                    if (tbeService.blockExercises.isEmpty) {
+                      return const Center(
+                          child: Text('Nenhum exercício adicionado a este bloco ainda.'));
+                    }
+                    return ListView.builder(
+                      itemCount: tbeService.blockExercises.length,
+                      itemBuilder: (context, index) {
+                        final tbe = tbeService.blockExercises[index];
+                        final exercise = tbe.exercise; // Acessando o Exercise aninhado
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                          child: ListTile(
+                            title: Text(
+                              exercise?.name ?? 'Exercício Desconhecido',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Categoria: ${exercise?.category ?? 'N/A'}'),
+                                Text('Ordem no Bloco: ${tbe.orderInBlock}')
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.add_task, color: Colors.blue),
+                                  tooltip: 'Registrar Log',
+                                  onPressed: () {
+                                    // Navega para a tela de registro de log
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AddEditExerciseLogScreen(
+                                          trainingBlockId: widget.trainingBlock.id,
+                                          exerciseId: exercise?.id ?? '', // ID do Exercise
+                                          // Você pode passar dados do TBE para pré-preencher o log
+                                          // initialSetsReps: tbe.defaultSetsReps,
+                                          // initialNotes: tbe.defaultNotes,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.grey),
+                                  tooltip: 'Editar',
+                                  onPressed: () {
+                                    // Implementar edição do TBE (e.g., ordem, notas padrão)
+                                    // Você precisaria de uma tela AddEditTrainingBlockExerciseScreen
+                                    // para editar as propriedades de `tbe`
+                                    // Navigator.push(context, MaterialPageRoute(builder: (_) => EditTrainingBlockExerciseScreen(tbe: tbe)));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Funcionalidade de edição a ser implementada.')),
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  tooltip: 'Remover do Bloco',
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text('Confirmar Remoção'),
+                                        content: Text('Tem certeza que deseja remover "${exercise?.name ?? 'Exercício Desconhecido'}" deste bloco?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(ctx).pop(),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(ctx).pop();
+                                              _deleteTrainingBlockExercise(tbe.id);
+                                            },
+                                            child: const Text('Remover'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Adicionar Exercício'),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _isLoadingExercises
-                ? const Center(child: CircularProgressIndicator())
-                : _exercisesErrorMessage != null
-                    ? Center(child: Text(_exercisesErrorMessage!, style: TextStyle(color: Colors.red)))
-                    : _exercisesInBlock.isEmpty
-                        ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text(
-                                'Nenhum exercício associado a este bloco. Adicione um!',
-                                style: TextStyle(fontSize: 16, color: Colors.grey),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          )
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: _exercisesInBlock.length,
-                            itemBuilder: (context, index) {
-                              final exercise = _exercisesInBlock[index];
-                              return ExerciseDefinitionCard(
-                                exercise: exercise,
-                                // TODO: Implementar lógica de exclusão/edição da ASSOCIAÇÃO do exercício ao bloco,
-                                // e não da definição do exercício em si (a menos que a intenção seja essa).
-                                // Por enquanto, essas callbacks são apenas placeholders.
-                                onEditDefinition: () async {
-                                  final result = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => ExerciseFormScreen(exercise: exercise),
-                                    ),
-                                  );
-                                  if (result == true) {
-                                    _fetchExercisesForBlock(); // Recarrega se a definição mudou
-                                  }
-                                },
-                                onDeleteAssociation: () {
-                                  // TODO: Confirmar e remover a ASSOCIAÇÃO do exercício a este bloco
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Remover ${exercise.name} deste bloco (TODO)')),
-                                  );
-                                },
-                                onViewLogs: () => _viewExerciseLogs(exercise),
-                                onAddLog: () => _addExerciseLog(exercise),
-                              );
-                            },
-                          ),
-            const SizedBox(height: 20),
-            // Informações adicionais do bloco (criado em, atualizado em)
-            Align(
-              alignment: Alignment.centerRight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Criado em: ${widget.block.createdAt.day}/${widget.block.createdAt.month}/${widget.block.createdAt.year}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  Text(
-                    'Última atualização: ${widget.block.updatedAt.day}/${widget.block.updatedAt.month}/${widget.block.updatedAt.year}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Widget para exibir um único exercício como um card
-class ExerciseDefinitionCard extends StatelessWidget {
-  final Exercise exercise;
-  final VoidCallback onEditDefinition; // Para editar a DEFINIÇÃO do exercício
-  final VoidCallback onDeleteAssociation; // Para remover o exercício DESTE bloco
-  final VoidCallback onViewLogs; // Para ver logs deste exercício neste bloco
-  final VoidCallback onAddLog; // Para adicionar um novo log para este exercício
-
-  const ExerciseDefinitionCard({
-    super.key,
-    required this.exercise,
-    required this.onEditDefinition,
-    required this.onDeleteAssociation,
-    required this.onViewLogs,
-    required this.onAddLog,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: InkWell(
-        onTap: onViewLogs, // Clicar no card pode levar para os logs
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          exercise.name,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (exercise.muscleGroup != null && exercise.muscleGroup!.isNotEmpty)
-                          Text(
-                            'Grupo Muscular: ${exercise.muscleGroup!}',
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
-                          ),
-                        if (exercise.equipmentType != null && exercise.equipmentType!.isNotEmpty)
-                          Text(
-                            'Equipamento: ${exercise.equipmentType!}',
-                            style: const TextStyle(fontSize: 13, color: Colors.grey),
-                          ),
-                      ],
-                    ),
-                  ),
-                  PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit_definition') {
-                        onEditDefinition();
-                      } else if (value == 'delete_association') {
-                        onDeleteAssociation();
-                      } else if (value == 'view_logs') {
-                        onViewLogs();
-                      }
-                    },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'edit_definition',
-                        child: Row(
-                          children: [Icon(Icons.edit, color: Colors.blue), SizedBox(width: 8), Text('Editar Definição')],
-                        ),
+                floatingActionButton:  FloatingActionButton(
+                  child: const Icon(Icons.add),
+                  tooltip: 'Adicionar Exercício ao Bloco',
+                  onPressed: () async {
+                    // Navega para uma tela de seleção de exercícios
+                    final selectedExerciseId = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ExerciseSelectionScreen(), // Crie esta tela se ainda não tiver
                       ),
-                      const PopupMenuItem<String>(
-                        value: 'delete_association',
-                        child: Row(
-                          children: [Icon(Icons.remove_circle_outline, color: Colors.orange), SizedBox(width: 8), Text('Remover do Bloco')],
-                        ),
-                      ),
-                      const PopupMenuItem<String>(
-                        value: 'view_logs',
-                        child: Row(
-                          children: [Icon(Icons.list_alt, color: Colors.green), SizedBox(width: 8), Text('Ver Logs')],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if (exercise.description != null && exercise.description!.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  exercise.description!,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                    );
+                    if (selectedExerciseId != null && selectedExerciseId is String) {
+                      await _addExerciseToBlock(selectedExerciseId);
+                    }
+                  },
                 ),
-              ],
-              const SizedBox(height: 12),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  onPressed: onAddLog,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Registrar Treino'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

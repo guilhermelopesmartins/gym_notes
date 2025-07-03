@@ -13,8 +13,6 @@ class TrainingBlockExercise(Base):
     training_block_id = Column(UUID(as_uuid=True), ForeignKey("training_blocks.id"), nullable=False)
     exercise_id = Column(UUID(as_uuid=True), ForeignKey("exercises.id"), nullable=False)
     order_in_block = Column(Integer, default=0, nullable=False)
-    default_sets_reps = Column(String(50))
-    default_notes = Column(Text)
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), default=datetime.now, onupdate=datetime.now)
 

@@ -83,10 +83,19 @@ class ExerciseLogService extends ChangeNotifier {
         },
         body: jsonEncode(logCreate.toJson()),
       );
-      final newLog = ExerciseLog.fromJson(response as Map<String, dynamic>);
-      _exerciseLogs.add(newLog); // Adiciona ao cache local (considere ordenar se necessário)
-      notifyListeners();
-      return newLog;
+      if (response.statusCode == 201 || response.statusCode == 200) { // O FastAPI geralmente retorna 201 Created para POST
+        // CORREÇÃO: Decodifique o corpo da resposta JSON
+        debugPrint('Response Body (log): ${response.body}');
+        final newLog = ExerciseLog.fromJson(json.decode(response.body) as Map<String, dynamic>);
+        _exerciseLogs.add(newLog); // Adiciona ao cache local
+        notifyListeners();
+        return newLog;
+      } else {
+        // Trate erros HTTP, incluindo mensagens do backend
+        final errorData = json.decode(response.body);
+        final errorMessage = errorData['detail'] ?? 'Falha ao criar log de exercício.';
+        throw Exception('Erro HTTP ${response.statusCode}: $errorMessage');
+      }
     } catch (e) {
       debugPrint('Erro ao criar log de exercício: $e');
       throw Exception('Erro ao criar log de exercício: ${e.toString().replaceFirst('Exception: ', '')}');
