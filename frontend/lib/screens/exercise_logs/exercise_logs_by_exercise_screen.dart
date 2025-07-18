@@ -19,13 +19,11 @@ class _ExerciseLogsByExerciseScreenState extends State<ExerciseLogsByExerciseScr
 
   @override
   void initState() {
-    super.initState();
-    // Acesse o serviço para obter os IDs definidos anteriormente
+    super.initState();    
     final exerciseLogService = Provider.of<ExerciseLogService>(context, listen: false);
     _currentTrainingBlockId = exerciseLogService.currentTrainingBlockId;
     _currentExerciseId = exerciseLogService.currentExerciseId;
-
-    // Verifique se os IDs são válidos antes de buscar
+    
     if (_currentTrainingBlockId != null && _currentExerciseId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         exerciseLogService.fetchExerciseLogs(
@@ -33,8 +31,7 @@ class _ExerciseLogsByExerciseScreenState extends State<ExerciseLogsByExerciseScr
           exerciseId: _currentExerciseId,
         );
       });
-    } else {
-      // Lidar com erro: IDs não definidos, talvez mostrar uma mensagem de erro
+    } else {      
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Erro: IDs de bloco/exercício não encontrados.")),
@@ -43,7 +40,6 @@ class _ExerciseLogsByExerciseScreenState extends State<ExerciseLogsByExerciseScr
     }
   }
 
-  // Função para agrupar logs por data (pode ser um utilitário)
   Map<DateTime, List<ExerciseLog>> _groupLogsByDate(List<ExerciseLog> logs) {
     final Map<DateTime, List<ExerciseLog>> groupedLogs = {};
     for (var log in logs) {
@@ -63,17 +59,14 @@ class _ExerciseLogsByExerciseScreenState extends State<ExerciseLogsByExerciseScr
       appBar: AppBar(
         title: Text('Logs do Exercício'),
       ),
-      body: Consumer<ExerciseLogService>( // Use Consumer para ouvir as mudanças
-        builder: (context, exerciseLogService, child) {
-          // Filtra a lista _exerciseLogs com base nos IDs que a tela está interessada
+      body: Consumer<ExerciseLogService>( 
+        builder: (context, exerciseLogService, child) {          
           final filteredLogs = exerciseLogService.exerciseLogs.where(
             (log) => log.trainingBlockId == _currentTrainingBlockId &&
                      log.exerciseId == _currentExerciseId
           ).toList();
 
           if (filteredLogs.isEmpty) {
-            // Se está carregando (precisa de um isLoading no serviço) ou se não há logs
-            // Por simplicidade aqui, se está vazio, assume-se que não há dados ou ainda carregando
             return const Center(child: Text('Nenhum log encontrado para este exercício neste bloco.'));
           }
           
@@ -103,7 +96,6 @@ class _ExerciseLogsByExerciseScreenState extends State<ExerciseLogsByExerciseScr
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Log ID: ${log.id.substring(0, 8)}...'),
                               Text('Notas: ${log.notes ?? 'N/A'}'),
                               const Text('Sets:'),
                               ...log.setsRepsData.map((set) =>

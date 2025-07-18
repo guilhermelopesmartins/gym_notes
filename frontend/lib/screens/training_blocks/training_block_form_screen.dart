@@ -5,7 +5,7 @@ import 'package:gym_notes/services/training_block_service.dart';
 import 'package:gym_notes/models/training_block.dart';
 
 class TrainingBlockFormScreen extends StatefulWidget {
-  final TrainingBlock? block; // Opcional: se for para editar, passa o bloco existente
+  final TrainingBlock? block; 
 
   const TrainingBlockFormScreen({super.key, this.block});
 
@@ -17,25 +17,23 @@ class _TrainingBlockFormScreenState extends State<TrainingBlockFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  String _selectedColorHex = '#FFFFFF'; // Cor padrão
+  String _selectedColorHex = '#FFFFFF'; 
   bool _isLoading = false;
-
-  // Lista de cores pré-definidas para o usuário escolher
+  
   final List<String> _availableColors = [
-    '#FFFFFF', // Branco
-    '#FFC107', // Âmbar (Amarelo)
-    '#4CAF50', // Verde
-    '#2196F3', // Azul
-    '#9C27B0', // Roxo
-    '#FF5722', // Laranja
-    '#E91E63', // Rosa
-    '#607D8B', // Azul-acinzentado
+    '#FFFFFF', 
+    '#FFC107', 
+    '#4CAF50', 
+    '#2196F3', 
+    '#9C27B0', 
+    '#FF5722', 
+    '#E91E63', 
+    '#607D8B', 
   ];
 
   @override
   void initState() {
-    super.initState();
-    // Se um bloco foi passado (modo de edição), preenche os campos
+    super.initState();    
     if (widget.block != null) {
       _titleController.text = widget.block!.title;
       _descriptionController.text = widget.block!.description ?? '';
@@ -63,7 +61,6 @@ class _TrainingBlockFormScreenState extends State<TrainingBlockFormScreen> {
 
     try {
       if (widget.block == null) {
-        // Criar novo bloco
         final newBlock = TrainingBlockCreate(
           title: _titleController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
@@ -74,7 +71,6 @@ class _TrainingBlockFormScreenState extends State<TrainingBlockFormScreen> {
           const SnackBar(content: Text('Bloco de treino criado com sucesso!')),
         );
       } else {
-        // Atualizar bloco existente
         final updatedBlock = TrainingBlockUpdate(
           title: _titleController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
@@ -85,7 +81,7 @@ class _TrainingBlockFormScreenState extends State<TrainingBlockFormScreen> {
           const SnackBar(content: Text('Bloco de treino atualizado com sucesso!')),
         );
       }
-      Navigator.of(context).pop(true); // Retorna true para indicar que uma operação foi bem-sucedida
+      Navigator.of(context).pop(true); 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao salvar bloco: ${e.toString().replaceFirst('Exception: ', '')}')),

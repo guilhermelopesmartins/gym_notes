@@ -1,9 +1,9 @@
 // lib/screens/auth/login_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Importe o Provider
+import 'package:provider/provider.dart'; 
 import 'package:gym_notes/services/auth_service.dart';
-import 'package:gym_notes/screens/home_screen.dart'; // Tela de destino após o login
-import 'package:gym_notes/screens/auth/register_screen.dart'; // Para o link de registro
+import 'package:gym_notes/screens/home_screen.dart'; 
+import 'package:gym_notes/screens/auth/register_screen.dart'; 
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,8 +13,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Chave para validar o formulário
-  bool _isLoading = false; // Estado para mostrar indicador de carregamento
+  final _formKey = GlobalKey<FormState>(); 
+  bool _isLoading = false; 
 
   @override
   void dispose() {
@@ -25,34 +25,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) {
-      return; // Não prossegue se o formulário for inválido
+      return; 
     }
 
     setState(() {
-      _isLoading = true; // Ativa o indicador de carregamento
+      _isLoading = true; 
     });
 
     final authService = Provider.of<AuthService>(context, listen: false);
 
     try {
-      // Chama o método de login do AuthService
       final user = await authService.login(
         _usernameController.text,
         _passwordController.text,
       );
 
       if (user != null) {
-        // Login bem-sucedido, navega para a HomeScreen e remove a LoginScreen da pilha
         Navigator.of(context).pushReplacementNamed('/training_blocks');
       }
     } catch (e) {
-      // Trata erros de login (ex: credenciais inválidas)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro de login: ${e.toString().replaceFirst('Exception: ', '')}')),
       );
     } finally {
       setState(() {
-        _isLoading = false; // Desativa o indicador de carregamento
+        _isLoading = false; 
       });
     }
   }
@@ -110,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: true, // Esconde a senha
+                  obscureText: true, 
                   decoration: InputDecoration(
                     labelText: 'Senha',
                     border: OutlineInputBorder(),
@@ -125,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 24),
                 _isLoading
-                    ? Center(child: CircularProgressIndicator()) // Mostra indicador de carregamento
+                    ? Center(child: CircularProgressIndicator()) 
                     : ElevatedButton(
                         onPressed: _login,
                         style: ElevatedButton.styleFrom(
@@ -141,8 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                 SizedBox(height: 16),
                 TextButton(
-                  onPressed: () {
-                    // Navegar para a tela de registro
+                  onPressed: () {                    
                     Navigator.of(context).pushNamed('/register');
                   },
                   child: Text(

@@ -9,5 +9,5 @@ class Constants {
   // static const String BASE_URL = 'http://192.168.1.100:8000'; // Para dispositivo físico (substitua pelo IP do seu PC)
 
   static const String TOKEN_KEY = 'jwt_token';
-  static const String USER_ID_KEY = 'user_id'; // Para armazenar o ID do usuário logado se precisar
+  static const String USER_ID_KEY = 'user_id';
 }

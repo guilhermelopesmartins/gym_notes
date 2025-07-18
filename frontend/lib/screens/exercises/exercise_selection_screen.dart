@@ -70,8 +70,7 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                           child: ListTile(
                             title: Text(exercise.name),
                             subtitle: Text(exercise.category),
-                            onTap: () {
-                              // Retorna o ID do exercício selecionado para a tela anterior
+                            onTap: () {                          
                               Navigator.pop(context, exercise.id);
                             },
                           ),

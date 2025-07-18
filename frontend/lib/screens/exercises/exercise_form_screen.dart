@@ -5,7 +5,7 @@ import 'package:gym_notes/models/exercise.dart';
 import 'package:gym_notes/services/exercise_service.dart';
 
 class ExerciseFormScreen extends StatefulWidget {
-  final Exercise? exercise; // Opcional: Se for para editar um exercício existente
+  final Exercise? exercise;
 
   const ExerciseFormScreen({super.key, this.exercise});
 
@@ -17,7 +17,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _categoryController = TextEditingController(); // NOVO
+  final _categoryController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -52,7 +52,6 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
 
     try {
       if (widget.exercise == null) {
-        // Lógica para CRIAR uma nova DEFINIÇÃO de exercício
         final newExercise = ExerciseCreate(
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
@@ -63,9 +62,8 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
           const SnackBar(content: Text('Definição de Exercício criada com sucesso!')),
         );
       } else {
-        // Lógica para ATUALIZAR uma DEFINIÇÃO de exercício existente
         final updatedExercise = ExerciseUpdate(
-          name: _nameController.text, // Assume que nome é sempre preenchido, mas verifique validação
+          name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           category: _categoryController.text.isEmpty ? null : _categoryController.text,
         );
@@ -74,7 +72,7 @@ class _ExerciseFormScreenState extends State<ExerciseFormScreen> {
           const SnackBar(content: Text('Definição de Exercício atualizada com sucesso!')),
         );
       }
-      Navigator.of(context).pop(true); // Retorna true para indicar sucesso e recarregar lista
+      Navigator.of(context).pop(true);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao salvar definição de exercício: ${e.toString().replaceFirst('Exception: ', '')}')),

@@ -1,15 +1,14 @@
-// lib/screens/exercise_logs/add_edit_exercise_log_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart'; // Para formatar datas, adicione ao pubspec.yaml se não tiver
-import 'package:gym_notes/models/exercise_log.dart'; // Seu modelo de ExerciseLog
-import 'package:gym_notes/services/exercise_log_service.dart'; // Seu ExerciseLogService
+import 'package:intl/intl.dart'; 
+import 'package:gym_notes/models/exercise_log.dart'; 
+import 'package:gym_notes/services/exercise_log_service.dart'; 
 import 'package:gym_notes/services/auth_service.dart';
 
 class AddEditExerciseLogScreen extends StatefulWidget {
   final String trainingBlockId;
   final String exerciseId;
-  final ExerciseLog? exerciseLog; // Nullable, para modo de edição
+  final ExerciseLog? exerciseLog; 
 
   const AddEditExerciseLogScreen({
     super.key,
@@ -73,7 +72,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
       _setControllers.add(TextEditingController(text: (_setControllers.length + 1).toString()));
       _repsControllers.add(TextEditingController());
       _weightControllers.add(TextEditingController());
-      _unitControllers.add(TextEditingController(text: 'kg')); // Default unit
+      _unitControllers.add(TextEditingController(text: 'kg')); 
       _rpeControllers.add(TextEditingController());
       _setNotesControllers.add(TextEditingController());
     });
@@ -95,7 +94,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
       _rpeControllers.removeAt(index);
       _setNotesControllers.removeAt(index);
 
-      // Reajusta os números dos sets
+      
       for (int i = 0; i < _setControllers.length; i++) {
         _setControllers[i].text = (i + 1).toString();
       }
@@ -139,8 +138,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
         final reps = int.tryParse(_repsControllers[i].text);
         final weight = double.tryParse(_weightControllers[i].text);
         final rpe = int.tryParse(_rpeControllers[i].text);
-
-        // Validação mínima para cada set
+      
         if (setNum == null || reps == null || weight == null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -167,7 +165,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
             exerciseId: widget.exerciseId,
             userId: currentUserId,
             logDate: _selectedDate,
-            setsRepsData: setsRepsDataList, // Passa a lista de SetData
+            setsRepsData: setsRepsDataList, 
             notes: _notesController.text.isEmpty ? null : _notesController.text,
           );
           await exerciseLogService.updateExerciseLog(widget.exerciseLog!.id, updatedLog);
@@ -193,7 +191,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
           }
         }
         if (mounted) {
-          Navigator.pop(context, true); // Volta e indica sucesso
+          Navigator.pop(context, true); 
         }
       } catch (e) {
         debugPrint('Erro ao salvar log de exercício: $e');
@@ -221,7 +219,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
                   'Set ${index + 1}',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
                 ),
-                if (_setControllers.length > 1) // Permite remover se houver mais de um set
+                if (_setControllers.length > 1) 
                   IconButton(
                     icon: const Icon(Icons.remove_circle, color: Colors.red),
                     onPressed: () => _removeSetField(index),
@@ -336,8 +334,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
         child: Form(
           key: _formKey,
           child: Column(
-            children: <Widget>[
-              // Campo de Data
+            children: <Widget>[            
               ListTile(
                 title: Text(
                   'Data: ${DateFormat('dd/MM/yyyy').format(_selectedDate)}',
@@ -346,8 +343,7 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context),
               ),
-              const SizedBox(height: 16.0),
-              // Sets
+              const SizedBox(height: 16.0),              
               Expanded(
                 child: ListView.builder(
                   itemCount: _setControllers.length,
@@ -361,14 +357,14 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
                 icon: const Icon(Icons.add),
                 label: const Text('Adicionar Set'),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(40), // Botão de largura total
+                  minimumSize: const Size.fromHeight(40), 
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
               ),
               const SizedBox(height: 16.0),
-              // Campo Notas do Log Total
+              
               TextFormField(
                 controller: _notesController,
                 decoration: const InputDecoration(
@@ -378,10 +374,9 @@ class _AddEditExerciseLogScreenState extends State<AddEditExerciseLogScreen> {
                 keyboardType: TextInputType.multiline,
                 maxLines: 3,
               ),
-              const SizedBox(height: 24.0),
-              // Botão Salvar
+              const SizedBox(height: 24.0),              
               SizedBox(
-                width: double.infinity, // Faz o botão ocupar a largura total
+                width: double.infinity, 
                 child: ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(

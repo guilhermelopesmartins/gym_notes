@@ -2,23 +2,22 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; // Importa o pacote http
-import 'package:shared_preferences/shared_preferences.dart'; // Para armazenamento local
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:gym_notes/models/user.dart'; // Modelos de usuário
-import 'package:gym_notes/models/token.dart'; // Modelo de token
-import 'package:gym_notes/utils/constants.dart'; // Constantes de URL e chaves
+import 'package:gym_notes/models/user.dart';
+import 'package:gym_notes/models/token.dart';
+import 'package:gym_notes/utils/constants.dart';
 
 class AuthService extends ChangeNotifier {
   final String _baseUrl = Constants.BASE_URL;
   final String _tokenKey = Constants.TOKEN_KEY;
-  final String _userIdKey = Constants.USER_ID_KEY; // Chave para o ID do usuário
+  final String _userIdKey = Constants.USER_ID_KEY;
 
-  String? _token; // Armazena o token na memória para acesso rápido
-  String? _currentUserId; // Armazena o ID do usuário na memória
+  String? _token;
+  String? _currentUserId;
   User? _currentUser;
 
-  // Getter para o token. Outras classes podem usá-lo.
   String? get token => _token;
   String? get currentUserId => _currentUserId;
   User? get currentUser => _currentUser;
@@ -27,8 +26,6 @@ class AuthService extends ChangeNotifier {
     _loadTokenAndUser();
   }
 
-
-  // --- Métodos de Leitura/Escrita de Token no SharedPreferences ---
   Future<void> _loadTokenAndUser() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString(_tokenKey);
@@ -38,7 +35,6 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Salva o token JWT e o ID do usuário no armazenamento local
   Future<void> _saveToken(String token, String userId) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
@@ -48,7 +44,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Remove o token JWT e o ID do usuário do armazenamento local (logout)
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
@@ -58,9 +53,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Métodos de Autenticação e API ---
-
-  // Método de Registro de Usuário
   Future<User?> register(String username, String email, String password) async {
     final uri = Uri.parse('$_baseUrl/auth/register');
     final userCreate = UserCreate(
@@ -72,37 +64,32 @@ class AuthService extends ChangeNotifier {
       final response = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(userCreate.toJson()), // Converte o objeto Dart para JSON string
+        body: jsonEncode(userCreate.toJson()),
       );
 
       if (response.statusCode == 201) {
-        // Registro bem-sucedido, retorna o usuário registrado
         return User.fromJson(jsonDecode(response.body));
       } else if (response.statusCode == 409) {
-        // Conflito (usuário/email já existe)
         final errorBody = jsonDecode(response.body);
         throw Exception(errorBody['detail'] ?? 'Nome de usuário ou email já em uso.');
       } else {
-        // Outros erros
         final errorBody = jsonDecode(response.body);
         throw Exception(errorBody['detail'] ?? 'Falha no registro.');
       }
     } catch (e) {
       print('Erro durante o registro: $e');
-      rethrow; // Exception('Failed to connect to the server or process registration: $e');
+      rethrow;
     }
   }
 
-  // Método de Login de Usuário
   Future<User?> login(String username, String password) async {
     final uri = Uri.parse('$_baseUrl/auth/token');
     try {
       final response = await http.post(
         uri,
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded', // Essencial para OAuth2PasswordRequestForm
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        // OAuth2PasswordRequestForm espera 'username' e 'password' no corpo do formulário
         body: {
           'username': username,
           'password': password,
@@ -111,11 +98,9 @@ class AuthService extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final tokenData = Token.fromJson(jsonDecode(response.body));
-        // Após o login, queremos os detalhes completos do usuário logado
-        // Fazemos uma requisição para /auth/me usando o token recém-obtido
         final user = await getMe(tokenData.accessToken);
         if (user != null) {
-          await _saveToken(tokenData.accessToken, user.id); // Salva o token e o ID do usuário
+          await _saveToken(tokenData.accessToken, user.id);
         }
         return user;
       } else if (response.statusCode == 401) {
@@ -127,16 +112,13 @@ class AuthService extends ChangeNotifier {
       }
     } catch (e) {
       print('Error during login: $e');
-      rethrow; // Exception('Failed to connect to the server or process login: $e');
+      rethrow;
     }
   }
 
-  // Método para obter os detalhes do usuário logado (usando um token)
   Future<User?> getMe([String? specificToken]) async {
-    // Usa o token passado como argumento ou o token armazenado
     final currentToken = specificToken ?? _token; 
     if (currentToken == null) {
-      //throw Exception('No authentication token found.');
       await logout();
       return null;
     }
@@ -146,7 +128,7 @@ class AuthService extends ChangeNotifier {
       final response = await http.get(
         uri,
         headers: {
-          'Authorization': 'Bearer $currentToken', // Anexa o token para autenticação
+          'Authorization': 'Bearer $currentToken',
         },
       );
 
@@ -171,13 +153,12 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Método para atualizar o perfil do usuário
   Future<User?> updateUser(UserUpdate userUpdate) async {
     if (_token == null) {
       throw Exception('No authentication token found. Please log in.');
     }
 
-    final uri = Uri.parse('$_baseUrl/auth/me'); // Endpoint PUT /auth/me
+    final uri = Uri.parse('$_baseUrl/auth/me');
     try {
       final response = await http.put(
         uri,
@@ -207,13 +188,12 @@ class AuthService extends ChangeNotifier {
     }
   }
   
-  // Retorna a URL da imagem no backend ou null em caso de falha
   Future<String?> uploadProfilePicture(File imageFile) async {
     final uri = Uri.parse('$_baseUrl/auth/upload_profile_picture');
     try {
       var request = http.MultipartRequest('POST', uri)
         ..files.add(await http.MultipartFile.fromPath(
-          'file', // O nome do campo do formulário no backend (definido em @router.post("/upload_profile_picture") como `file: UploadFile = File(...)`)
+          'file',
           imageFile.path,
         ));
 
@@ -222,9 +202,8 @@ class AuthService extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(respStr);
-        final String? imageUrl = responseData['url']; // URL relativa do backend
+        final String? imageUrl = responseData['url'];
         if (imageUrl != null) {
-          // Construir a URL completa para ser salva no banco de dados e usada pelo frontend
           return '$_baseUrl$imageUrl';
         }
         return null;
@@ -250,7 +229,7 @@ class AuthService extends ChangeNotifier {
         }
       } catch (e) {
         print('Erro ao carregar imagem para registro: $e');
-        rethrow; // Rejoga a exceção para que a UI possa lidar com ela
+        rethrow;
       }
     }
 
@@ -259,7 +238,7 @@ class AuthService extends ChangeNotifier {
       username: username,
       email: email,
       password: password,
-      profilePictureUrl: profilePictureUrl, // Passa a URL obtida do upload
+      profilePictureUrl: profilePictureUrl,
     );
 
     try {
@@ -271,8 +250,6 @@ class AuthService extends ChangeNotifier {
 
       if (response.statusCode == 201) {
         final registeredUser = User.fromJson(jsonDecode(response.body));
-        // Opcional: Logar o usuário automaticamente após o registro bem-sucedido
-        // await login(username, password); 
         return registeredUser;
       } else if (response.statusCode == 409) {
         final errorBody = jsonDecode(response.body);

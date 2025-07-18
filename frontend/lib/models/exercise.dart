@@ -1,9 +1,8 @@
 // lib/models/exercise.dart
 import 'package:json_annotation/json_annotation.dart';
 
-part 'exercise.g.dart'; // Parte gerada automaticamente pelo json_serializable
+part 'exercise.g.dart'; 
 
-// --- Modelo Principal do Exercício (schemas.ExerciseInDB ou ExerciseBase) ---
 @JsonSerializable()
 class Exercise {
   final String id;
@@ -25,14 +24,11 @@ class Exercise {
     required this.updatedAt,
   });
 
-  // Factory constructor para desserialização JSON
   factory Exercise.fromJson(Map<String, dynamic> json) => _$ExerciseFromJson(json);
-
-  // Método para serialização JSON
+  
   Map<String, dynamic> toJson() => _$ExerciseToJson(this);
 }
 
-// --- Modelo para Criação de Exercício (schemas.ExerciseCreate) ---
 @JsonSerializable()
 class ExerciseCreate {
   final String name;
@@ -50,7 +46,6 @@ class ExerciseCreate {
   Map<String, dynamic> toJson() => _$ExerciseCreateToJson(this);
 }
 
-// --- Modelo para Atualização de Exercício (schemas.ExerciseUpdate) ---
 @JsonSerializable()
 class ExerciseUpdate {
   final String? name;

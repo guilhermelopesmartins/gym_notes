@@ -1,11 +1,11 @@
 // lib/screens/training_blocks/training_block_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:gym_notes/models/training_block.dart'; // Importe seu modelo TrainingBlock
-import 'package:gym_notes/models/training_block_exercise.dart'; // Importe o modelo TrainingBlockExercise
-import 'package:gym_notes/services/training_block_exercise_service.dart'; // Importe o novo serviço
-import 'package:gym_notes/screens/exercise_logs/add_edit_exercise_log_screen.dart'; // Para adicionar logs
-import 'package:gym_notes/screens/exercises/exercise_selection_screen.dart'; // Para selecionar exercícios para adicionar
+import 'package:gym_notes/models/training_block.dart'; 
+import 'package:gym_notes/models/training_block_exercise.dart'; 
+import 'package:gym_notes/services/training_block_exercise_service.dart'; 
+import 'package:gym_notes/screens/exercise_logs/add_edit_exercise_log_screen.dart'; 
+import 'package:gym_notes/screens/exercises/exercise_selection_screen.dart'; 
 import 'package:gym_notes/services/exercise_log_service.dart';
 
 class TrainingBlockDetailScreen extends StatefulWidget {
@@ -24,7 +24,6 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Carrega os exercícios do bloco quando a tela é inicializada
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadTrainingBlockExercises();
     });
@@ -42,7 +41,7 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
       setState(() {
         _errorMessage = e.toString();
       });
-      if (mounted) { // Verifica se o widget ainda está montado antes de mostrar o SnackBar
+      if (mounted) { 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao carregar exercícios do bloco: ${e.toString().replaceFirst('Exception: ', '')}')),
         );
@@ -59,12 +58,12 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
       final tbeCreate = TrainingBlockExerciseCreate(
         trainingBlockId: widget.trainingBlock.id,
         exerciseId: exerciseId,
-        orderInBlock: 0, // Defina uma ordem padrão ou implemente lógica para determinar a próxima ordem
+        orderInBlock: 0, 
         notes: null,
       );
       await Provider.of<TrainingBlockExerciseService>(context, listen: false)
           .addExerciseToTrainingBlock(tbeCreate);
-      await _loadTrainingBlockExercises(); // Recarrega a lista para mostrar o novo exercício
+      await _loadTrainingBlockExercises(); 
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -78,7 +77,6 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
     try {
       await Provider.of<TrainingBlockExerciseService>(context, listen: false)
           .deleteTrainingBlockExercise(tbeId);
-      // A lista será atualizada automaticamente via notifyListeners() do service
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Exercício removido do bloco com sucesso!')),
@@ -136,17 +134,13 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.add_task, color: Colors.blue),
                                   tooltip: 'Registrar Log',
-                                  onPressed: () {
-                                    // Navega para a tela de registro de log
+                                  onPressed: () {                             
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => AddEditExerciseLogScreen(
                                           trainingBlockId: widget.trainingBlock.id,
-                                          exerciseId: exercise?.id ?? '', // ID do Exercise
-                                          // Você pode passar dados do TBE para pré-preencher o log
-                                          // initialSetsReps: tbe.defaultSetsReps,
-                                          // initialNotes: tbe.defaultNotes,
+                                          exerciseId: exercise?.id ?? '', 
                                         ),
                                       ),
                                     );
@@ -155,13 +149,11 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
                                 IconButton(
                                   icon: const Icon(Icons.history),
                                   onPressed: () {
-                                    if (exercise != null) {
-                                      // 1. Defina os IDs no serviço ANTES de navegar
+                                    if (exercise != null) {                                    
                                         exerciseLogService.setContextualLogIds(
                                           trainingBlockId: widget.trainingBlock.id,
                                           exerciseId:exercise.id,
-                                        );
-                                      // 2. Navegue para a tela de logs específica
+                                        );                                      
                                       Navigator.of(context).pushNamed('/exercise_logs_by_exercise');
                                     } else {
                                       ScaffoldMessenger.of(context).showSnackBar(
@@ -207,12 +199,11 @@ class _TrainingBlockDetailScreenState extends State<TrainingBlockDetailScreen> {
                 floatingActionButton:  FloatingActionButton(
                   child: const Icon(Icons.add),
                   tooltip: 'Adicionar Exercício ao Bloco',
-                  onPressed: () async {
-                    // Navega para uma tela de seleção de exercícios
+                  onPressed: () async {                    
                     final selectedExerciseId = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ExerciseSelectionScreen(), // Crie esta tela se ainda não tiver
+                        builder: (context) => const ExerciseSelectionScreen(), 
                       ),
                     );
                     if (selectedExerciseId != null && selectedExerciseId is String) {

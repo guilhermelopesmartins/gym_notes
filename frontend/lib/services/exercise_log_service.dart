@@ -24,7 +24,6 @@ class ExerciseLogService extends ChangeNotifier {
     return prefs.getString(Constants.TOKEN_KEY);
   }
 
-  // Método para buscar logs de exercícios com filtros
   Future<void> fetchExerciseLogs({
     String? trainingBlockId,
     String? exerciseId,
@@ -49,7 +48,7 @@ class ExerciseLogService extends ChangeNotifier {
         queryParams['exercise_id'] = exerciseId;
       }
       if (logDate != null) {
-        queryParams['log_date'] = logDate.toIso8601String().split('T')[0]; // Formato YYYY-MM-DD
+        queryParams['log_date'] = logDate.toIso8601String().split('T')[0];
       }
       final uri = Uri.parse('$_baseUrl/exercise_logs/')
           .replace(queryParameters: queryParams);
@@ -60,10 +59,8 @@ class ExerciseLogService extends ChangeNotifier {
         },
       );
 
-      // Usar ExerciseLogWithDetails se a API retornar os dados aninhados
       _exerciseLogs = (json.decode(response.body) as List)
           .map((json) => ExerciseLog.fromJson(json as Map<String, dynamic>))
-          // Ou: .map((json) => ExerciseLogWithDetails.fromJson(json as Map<String, dynamic>))
           .toList();
       notifyListeners();
     } catch (e) {
@@ -82,7 +79,6 @@ class ExerciseLogService extends ChangeNotifier {
     _currentExerciseId = null;
   }
 
-  // Método para criar um novo log de exercício
   Future<ExerciseLog> createExerciseLog(ExerciseLogCreateUpdate logCreate) async {
     try {
       final token = await _getAccessToken();
@@ -98,15 +94,13 @@ class ExerciseLogService extends ChangeNotifier {
         },
         body: jsonEncode(logCreate.toJson()),
       );
-      if (response.statusCode == 201 || response.statusCode == 200) { // O FastAPI geralmente retorna 201 Created para POST
-        // CORREÇÃO: Decodifique o corpo da resposta JSON
+      if (response.statusCode == 201 || response.statusCode == 200) {
         debugPrint('Response Body (log): ${response.body}');
         final newLog = ExerciseLog.fromJson(json.decode(response.body) as Map<String, dynamic>);
-        _exerciseLogs.add(newLog); // Adiciona ao cache local
+        _exerciseLogs.add(newLog);
         notifyListeners();
         return newLog;
       } else {
-        // Trate erros HTTP, incluindo mensagens do backend
         final errorData = json.decode(response.body);
         final errorMessage = errorData['detail'] ?? 'Falha ao criar log de exercício.';
         throw Exception('Erro HTTP ${response.statusCode}: $errorMessage');
@@ -117,7 +111,6 @@ class ExerciseLogService extends ChangeNotifier {
     }
   }
 
-  // Método para atualizar um log de exercício
   Future<ExerciseLog> updateExerciseLog(String id, ExerciseLogCreateUpdate logUpdate) async {
     try {
       final token = await _getAccessToken();
@@ -134,7 +127,6 @@ class ExerciseLogService extends ChangeNotifier {
         body: jsonEncode(logUpdate.toJson()),
       );
       final updatedLog = ExerciseLog.fromJson(response as Map<String, dynamic>);
-      // Atualiza no cache local
       final index = _exerciseLogs.indexWhere((log) => log.id == id);
       if (index != -1) {
         _exerciseLogs[index] = updatedLog;
@@ -147,7 +139,6 @@ class ExerciseLogService extends ChangeNotifier {
     }
   }
 
-  // Método para deletar um log de exercício
   Future<void> deleteExerciseLog(String id) async {
     try {
       final token = await _getAccessToken();
@@ -161,7 +152,7 @@ class ExerciseLogService extends ChangeNotifier {
           'Authorization': 'Bearer $token',
         },
       );
-      _exerciseLogs.removeWhere((log) => log.id == id); // Remove do cache local
+      _exerciseLogs.removeWhere((log) => log.id == id);
       notifyListeners();
     } catch (e) {
       debugPrint('Erro ao deletar log de exercício: $e');

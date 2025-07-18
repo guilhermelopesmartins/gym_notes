@@ -14,7 +14,6 @@ router = APIRouter(
     tags=["Training Blocks"], 
 )
 
-# --- Endpoint para Criar um Novo Bloco de Treino ---
 @router.post("/", response_model=schemas_training_block.TrainingBlockInDB, status_code=status.HTTP_201_CREATED)
 def create_training_block(
     training_block: schemas_training_block.TrainingBlockCreate,
@@ -30,7 +29,6 @@ def create_training_block(
     db.refresh(db_training_block)
     return db_training_block
 
-# --- Endpoint para Listar Blocos de Treino ---
 @router.get("/", response_model=List[schemas_training_block.TrainingBlockInDB])
 def read_training_blocks(
     current_user: User = Depends(get_current_user),
@@ -43,7 +41,6 @@ def read_training_blocks(
                         .offset(skip).limit(limit).all()
     return training_blocks
 
-# --- Endpoint para Obter um Bloco de Treino por ID ---
 @router.get("/{block_id}", response_model=schemas_training_block.TrainingBlockInDB)
 def read_training_block(
     block_id: str,
@@ -58,7 +55,6 @@ def read_training_block(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Training block not found")
     return db_training_block
 
-# --- Endpoint para Atualizar um Bloco de Treino ---
 @router.put("/{block_id}", response_model=schemas_training_block.TrainingBlockInDB)
 def update_training_block(
     block_id: str,
@@ -73,7 +69,7 @@ def update_training_block(
     if db_training_block is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Training block not found")
 
-    update_data = training_block_update.model_dump(exclude_unset=True) # Exclui campos que não foram definidos no payload
+    update_data = training_block_update.model_dump(exclude_unset=True) 
     for key, value in update_data.items():
         setattr(db_training_block, key, value)
 
@@ -82,7 +78,6 @@ def update_training_block(
     db.refresh(db_training_block)
     return db_training_block
 
-# --- Endpoint para Deletar um Bloco de Treino ---
 @router.delete("/{block_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_training_block(
     block_id: str,

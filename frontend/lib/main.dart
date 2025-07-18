@@ -13,12 +13,12 @@ import 'package:gym_notes/services/exercise_log_service.dart';
 // Telas de Autenticação e Home
 import 'package:gym_notes/screens/auth/login_screen.dart';
 import 'package:gym_notes/screens/auth/register_screen.dart';
-import 'package:gym_notes/screens/home_screen.dart'; // Tela principal após o login
+import 'package:gym_notes/screens/home_screen.dart';
 
 // Telas de Bloco de Treino
 import 'package:gym_notes/screens/training_blocks/training_blocks_list_screen.dart';
 import 'package:gym_notes/screens/training_blocks/training_block_form_screen.dart';
-import 'package:gym_notes/screens/training_blocks/training_block_detail_screen.dart'; // Se você for navegar para ela via rota
+import 'package:gym_notes/screens/training_blocks/training_block_detail_screen.dart';
 
 // NOVAS TELAS DE LOGS
 import 'package:gym_notes/screens/exercise_logs/exercise_logs_by_exercise_screen.dart';
@@ -26,7 +26,7 @@ import 'package:gym_notes/screens/exercise_logs/all_user_logs_screen.dart';
 
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Garante que o Flutter Binding está inicializado
+  WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferences.getInstance();
 
   runApp(
@@ -146,7 +146,6 @@ class MyApp extends StatelessWidget {
 
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // Decide qual tela mostrar com base no token existente
       home: Consumer<AuthService>(
         builder: (context, auth, _) {
           if (auth.token != null && auth.currentUserId != null) {

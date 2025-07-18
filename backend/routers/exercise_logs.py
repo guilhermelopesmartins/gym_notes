@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from datetime import date
 
-# Importa os models e schemas necessários
 from models import exercise_log as models_log
 from models import exercise as models_exercise
 from models import training_block as models_training_block
@@ -17,14 +16,12 @@ router = APIRouter(
     tags=["Exercise Logs"],
 )
 
-# --- Endpoint para Registrar um Novo Log de Exercício ---
 @router.post("/", response_model=schemas_log.ExerciseLogInDB, status_code=status.HTTP_201_CREATED)
 def create_exercise_log(
     log: schemas_log.ExerciseLogCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # Verifica se o training_block_id existe
     training_block = db.query(models_training_block.TrainingBlock)\
                     .filter(models_training_block.TrainingBlock.id == log.training_block_id)\
                     .filter(models_training_block.TrainingBlock.user_id == current_user.id)\
@@ -45,7 +42,6 @@ def create_exercise_log(
     db.refresh(db_log)
     return db_log
 
-# --- Endpoint para Listar Logs de Exercícios ---
 @router.get("/", response_model=List[schemas_log.ExerciseLogWithDetails])
 def read_exercise_logs(
     current_user: User = Depends(get_current_user),
@@ -71,7 +67,6 @@ def read_exercise_logs(
     logs = query.order_by(models_log.ExerciseLog.log_date.desc(), models_log.ExerciseLog.created_at.desc()).offset(skip).limit(limit).all()
     return logs
 
-# --- Endpoint para Obter um Log de Exercício por ID ---
 @router.get("/{log_id}", response_model=schemas_log.ExerciseLogWithDetails)
 def read_exercise_log(
     log_id: str,
@@ -88,7 +83,6 @@ def read_exercise_log(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise log not found")
     return db_log
 
-# --- Endpoint para Atualizar um Log de Exercício ---
 @router.put("/{log_id}", response_model=schemas_log.ExerciseLogInDB)
 def update_exercise_log(
     log_id: str,
@@ -120,7 +114,6 @@ def update_exercise_log(
     db.refresh(db_log)
     return db_log
 
-# --- Endpoint para Deletar um Log de Exercício ---
 @router.delete("/{log_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_exercise_log(
     log_id: str,

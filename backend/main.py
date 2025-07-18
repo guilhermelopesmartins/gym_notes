@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from typing import List
 from fastapi.staticfiles import StaticFiles
 
-# Importa tudo que você criou
 from routers import exercises as exercises
 from routers import training_blocks as training_blocks_router
 from routers import training_block_exercises as tbe_router
@@ -42,7 +41,6 @@ origins = [
     "http://localhost:5000"
 ]
 
-# rodar o fluter com uma porta especifica se usar um browser, ex.: flutter run -d chrome --web-port 3000
 
 app.add_middleware(
     CORSMiddleware,

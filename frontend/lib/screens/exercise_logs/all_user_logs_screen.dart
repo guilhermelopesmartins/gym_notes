@@ -17,11 +17,10 @@ class _AllUserLogsScreenState extends State<AllUserLogsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ExerciseLogService>(context, listen: false).fetchExerciseLogs(); // Sem parâmetros para todos os logs
+      Provider.of<ExerciseLogService>(context, listen: false).fetchExerciseLogs(); 
     });
   }
 
-  // Função para agrupar logs por data (reutilizável)
   Map<DateTime, List<ExerciseLog>> _groupLogsByDate(List<ExerciseLog> logs) {
     final Map<DateTime, List<ExerciseLog>> groupedLogs = {};
     for (var log in logs) {
@@ -75,10 +74,6 @@ class _AllUserLogsScreenState extends State<AllUserLogsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Se você tem ExerciseLogWithDetails, pode usar:
-                              // Text('Exercício: ${log.exercise?.name ?? 'Desconhecido'}'),
-                              // Text('Bloco: ${log.trainingBlock?.name ?? 'Desconhecido'}'),
-                              Text('Exercício ID: ${log.exerciseId.substring(0, 8)}...'),
                               Text('Bloco ID: ${log.trainingBlockId.substring(0, 8)}...'),
                               Text('Notas do Log: ${log.notes ?? 'N/A'}'),
                               const Text('Sets:'),

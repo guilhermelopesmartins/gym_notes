@@ -8,7 +8,7 @@ import 'package:gym_notes/screens/exercise_logs/exercise_log_form_screen.dart';
 class ExerciseLogsListScreen extends StatefulWidget {
   final String trainingBlockId;
   final String exerciseId;
-  final String exerciseName; // Para o título
+  final String exerciseName; 
 
   const ExerciseLogsListScreen({
     super.key,
@@ -77,7 +77,7 @@ class _ExerciseLogsListScreenState extends State<ExerciseLogsListScreen> {
     if (confirm == true) {
       try {
         setState(() {
-          _isLoading = true; // Mostra loader enquanto deleta
+          _isLoading = true; 
         });
         await Provider.of<ExerciseLogService>(context, listen: false).deleteExerciseLog(log.id);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,7 +89,7 @@ class _ExerciseLogsListScreenState extends State<ExerciseLogsListScreen> {
         );
       } finally {
         setState(() {
-          _isLoading = false; // Esconde loader
+          _isLoading = false; 
         });
       }
     }
@@ -107,7 +107,7 @@ class _ExerciseLogsListScreenState extends State<ExerciseLogsListScreen> {
       ),
     );
     if (result == true) {
-      _fetchExerciseLogs(); // Recarrega os logs após a edição
+      _fetchExerciseLogs(); 
     }
   }
 
@@ -153,10 +153,7 @@ class _ExerciseLogsListScreenState extends State<ExerciseLogsListScreen> {
                   builder: (context, exerciseLogService, child) {
                     final logs = exerciseLogService.exerciseLogs.where((log) =>
                         log.trainingBlockId == widget.trainingBlockId &&
-                        log.exerciseId == widget.exerciseId).toList();
-                    // A filtragem acima só é necessária se fetchExerciseLogs traz TUDO.
-                    // Se o fetch já filtra pela API, essa parte pode ser removida.
-                    // Idealmente, a API já faria essa filtragem.
+                        log.exerciseId == widget.exerciseId).toList();                   
 
                     if (logs.isEmpty) {
                       return Center(
@@ -167,16 +164,15 @@ class _ExerciseLogsListScreenState extends State<ExerciseLogsListScreen> {
                         ),
                       );
                     }
-
-                    // Agrupa logs por data para exibir cabeçalhos de data
+                    
                     final Map<DateTime, List<ExerciseLog>> logsByDate = {};
                     for (var log in logs) {
-                      final date = DateTime(log.logDate.year, log.logDate.month, log.logDate.day); // Normaliza para data sem hora
+                      final date = DateTime(log.logDate.year, log.logDate.month, log.logDate.day); 
                       logsByDate.putIfAbsent(date, () => []).add(log);
                     }
 
                     final sortedDates = logsByDate.keys.toList()
-                      ..sort((a, b) => b.compareTo(a)); // Ordena as datas mais recentes primeiro
+                      ..sort((a, b) => b.compareTo(a)); 
 
                     return ListView.builder(
                       itemCount: sortedDates.length,
@@ -224,7 +220,7 @@ class _ExerciseLogsListScreenState extends State<ExerciseLogsListScreen> {
             ),
           ).then((value) {
             if (value == true) {
-              _fetchExerciseLogs(); // Recarrega os logs após adicionar um novo
+              _fetchExerciseLogs(); 
             }
           });
         },
@@ -235,7 +231,6 @@ class _ExerciseLogsListScreenState extends State<ExerciseLogsListScreen> {
   }
 }
 
-// Widget para exibir um único ExerciseLog como um card
 class ExerciseLogCard extends StatelessWidget {
   final ExerciseLog exerciseLog;
   final VoidCallback onEdit;
@@ -262,9 +257,7 @@ class ExerciseLogCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  // Você precisaria do nome do exercício aqui, talvez passando-o para este widget
-                  // ou buscando-o de exerciseLog.exercise.name se usar ExerciseLogWithDetails
+                Text(                  
                   'Treino de ${exerciseLog.logDate.day}/${exerciseLog.logDate.month}/${exerciseLog.logDate.year}',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -283,7 +276,6 @@ class ExerciseLogCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            // Exibindo os sets
             if (exerciseLog.setsRepsData.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

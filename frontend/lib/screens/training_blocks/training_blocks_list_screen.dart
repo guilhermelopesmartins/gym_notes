@@ -48,7 +48,6 @@ class _TrainingBlocksListScreenState extends State<TrainingBlocksListScreen> {
     }
   }
 
-  // Método para confirmar e deletar um bloco de treino
   Future<void> _confirmAndDeleteBlock(String blockId) async {
     final bool? confirm = await showDialog(
       context: context,
@@ -139,30 +138,25 @@ class _TrainingBlocksListScreenState extends State<TrainingBlocksListScreen> {
         title: const Text('Meus Blocos de Treino'),
         automaticallyImplyLeading: false,
         actions: [
-          Consumer<AuthService>( // Use Consumer para reagir a mudanças no AuthService
+          Consumer<AuthService>( 
             builder: (context, authService, child) {
               final user = authService.currentUser;
-              if (user != null && user.profilePictureUrl != null) {
-                // Se a URL for um caminho relativo, adicione a base da URL do backend
+              if (user != null && user.profilePictureUrl != null) {                
                 final imageUrl = user.profilePictureUrl!.startsWith('http')
                     ? user.profilePictureUrl!
-                    : '${Constants.BASE_URL}${user.profilePictureUrl!}'; // Certifique-se que Constants.BASE_URL é o seu IP/porta do backend
+                    : '${Constants.BASE_URL}${user.profilePictureUrl!}'; 
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: CircleAvatar(
                     backgroundImage: NetworkImage(imageUrl),
-                    radius: 20,
-                    // Você pode adicionar um GestureDetector para ir para a tela de perfil
+                    radius: 20,                    
                     child: GestureDetector(
                       onTap: () {
-                        // Navegar para uma tela de perfil do usuário, se tiver
-                        // Navigator.of(context).pushNamed('/profile');
                       },
                     ),
                   ),
                 );
-              } else {
-                // Placeholder se não houver foto de perfil
+              } else {                
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: CircleAvatar(
@@ -285,7 +279,6 @@ class _TrainingBlocksListScreenState extends State<TrainingBlocksListScreen> {
   }
 }
 
-// Widget para exibir um único bloco de treino como um card
 class TrainingBlockCard extends StatelessWidget {
   final TrainingBlock block;
   final VoidCallback onEdit;
@@ -313,10 +306,6 @@ class TrainingBlockCard extends StatelessWidget {
               builder: (context) => TrainingBlockDetailScreen(trainingBlock: block),
             ),
           ).then((value) {
-            // TODO: Se a tela de detalhes tiver alguma edição que afete a lista,
-            // você pode querer atualizar a lista aqui.
-            // Por exemplo, se um exercício é adicionado/removido e isso altera a "prévia" do bloco.
-            // Para mudanças no bloco em si (título/descrição), o `onEdit` já cuida.
           });
         },
         child: Padding(

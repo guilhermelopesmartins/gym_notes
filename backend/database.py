@@ -18,10 +18,10 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# --- Função de Dependência para o FastAPI ---
+
 def get_db():
-    db = SessionLocal() # Cria uma nova sessão para a requisição
+    db = SessionLocal() 
     try:
-        yield db # Retorna a sessão e permite que o endpoint a utilize
+        yield db 
     finally:
-        db.close() # Garante que a sessão seja fechada após a requisição, liberando recursos
+        db.close() 

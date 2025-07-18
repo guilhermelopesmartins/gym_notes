@@ -1,29 +1,27 @@
 // lib/models/exercise_log.dart
 import 'package:json_annotation/json_annotation.dart';
-import 'package:uuid/uuid.dart'; // Para gerar UUIDs se precisar no frontend
+import 'package:uuid/uuid.dart'; 
 
-// Importe outros modelos se ExerciseLogWithDetails precisar deles.
-// Por exemplo, se você quiser incluir detalhes do Exercise ou TrainingBlock diretamente no log.
 import 'package:gym_notes/models/exercise.dart';
 import 'package:gym_notes/models/training_block.dart';
-import 'package:gym_notes/models/user.dart'; // Se o log incluir detalhes do usuário
+import 'package:gym_notes/models/user.dart'; 
 
-part 'exercise_log.g.dart'; // Parte gerada automaticamente pelo json_serializable
+part 'exercise_log.g.dart'; 
 
 @JsonSerializable()
 class SetData {
-  final int set; // Nome do campo 'set' no backend
+  final int set; 
   final int reps;
-  final double weight; // Note: peso é obrigatório no seu SetData do backend
+  final double weight; 
   final String? unit;
   final int? rpe;
-  final String? notes; // 'notes' dentro do SetData para notas específicas do set
+  final String? notes; 
 
   SetData({
     required this.set,
     required this.reps,
-    required this.weight, // obrigatório
-    this.unit = 'kg', // Padrão 'kg' conforme seu backend
+    required this.weight, 
+    this.unit = 'kg', 
     this.rpe,
     this.notes,
   });
@@ -51,7 +49,6 @@ class ExerciseLog {
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
 
-  // Construtor
   ExerciseLog({
     required this.id,
     required this.trainingBlockId,
@@ -63,19 +60,15 @@ class ExerciseLog {
     required this.createdAt,
     required this.updatedAt,
   });
-
-  // Factory constructor para desserialização JSON
+  
   factory ExerciseLog.fromJson(Map<String, dynamic> json) => _$ExerciseLogFromJson(json);
-
-  // Método para serialização JSON
+  
   Map<String, dynamic> toJson() => _$ExerciseLogToJson(this);
-
-  // Métodos estáticos auxiliares para serialização/desserialização de datas
+  
   static DateTime _dateFromJson(String date) => DateTime.parse(date);
-  static String _dateToJson(DateTime date) => date.toIso8601String().split('T')[0]; // Apenas a data YYYY-MM-DD
+  static String _dateToJson(DateTime date) => date.toIso8601String().split('T')[0]; 
 }
 
-// --- Modelo para Criar/Atualizar (sem IDs gerados pelo backend) ---
 @JsonSerializable()
 class ExerciseLogCreateUpdate {
   @JsonKey(name: 'training_block_id')
@@ -102,7 +95,6 @@ class ExerciseLogCreateUpdate {
   factory ExerciseLogCreateUpdate.fromJson(Map<String, dynamic> json) => _$ExerciseLogCreateUpdateFromJson(json);
   Map<String, dynamic> toJson() => _$ExerciseLogCreateUpdateToJson(this);
 
-  // Reutiliza os mesmos métodos de data
   static DateTime _dateFromJson(String date) => DateTime.parse(date);
   static String _dateToJson(DateTime date) => date.toIso8601String().split('T')[0];
 }
@@ -111,8 +103,8 @@ class ExerciseLogCreateUpdate {
 class ExerciseLogWithDetails extends ExerciseLog {
   final Exercise exercise;
   @JsonKey(name: 'training_block')
-  final TrainingBlock trainingBlock; // Assumindo que você tem um modelo TrainingBlock no Flutter
-  final User user; // Assumindo que você tem um modelo User no Flutter
+  final TrainingBlock trainingBlock; 
+  final User user; 
 
   ExerciseLogWithDetails({
     required super.id,

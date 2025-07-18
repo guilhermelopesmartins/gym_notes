@@ -1,12 +1,8 @@
 // lib/models/training_block.dart
 import 'package:json_annotation/json_annotation.dart';
-
-// Se você quiser incluir os detalhes do usuário que possui este bloco, importe User
 import 'package:gym_notes/models/user.dart'; 
+part 'training_block.g.dart'; 
 
-part 'training_block.g.dart'; // Parte gerada automaticamente pelo json_serializable
-
-// --- Modelo Principal do Bloco de Treino (schemas.TrainingBlockInDB) ---
 @JsonSerializable()
 class TrainingBlock {
   final String id;
@@ -15,12 +11,12 @@ class TrainingBlock {
   @JsonKey(name: 'color_hex')
   final String colorHex;
   @JsonKey(name: 'user_id')
-  final String userId; // O ID do usuário dono do bloco
+  final String userId; 
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
-  final User? user; // Detalhes do usuário dono
+  final User? user; 
 
   TrainingBlock({
     required this.id,
@@ -32,15 +28,12 @@ class TrainingBlock {
     required this.updatedAt,
     this.user,
   });
-
-  // Factory constructor para desserialização JSON
+  
   factory TrainingBlock.fromJson(Map<String, dynamic> json) => _$TrainingBlockFromJson(json);
 
-  // Método para serialização JSON
   Map<String, dynamic> toJson() => _$TrainingBlockToJson(this);
 }
 
-// --- Modelo para Criação de Bloco de Treino (schemas.TrainingBlockCreate) ---
 @JsonSerializable()
 class TrainingBlockCreate {
   final String title;
@@ -51,14 +44,13 @@ class TrainingBlockCreate {
   TrainingBlockCreate({
     required this.title,
     this.description,
-    this.colorHex = '#FFFFFF', // Valor padrão, como no backend
+    this.colorHex = '#FFFFFF', 
   });
 
   factory TrainingBlockCreate.fromJson(Map<String, dynamic> json) => _$TrainingBlockCreateFromJson(json);
   Map<String, dynamic> toJson() => _$TrainingBlockCreateToJson(this);
 }
 
-// --- Modelo para Atualização de Bloco de Treino (schemas.TrainingBlockUpdate) ---
 @JsonSerializable()
 class TrainingBlockUpdate {
   final String? title;

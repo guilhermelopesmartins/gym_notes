@@ -15,13 +15,11 @@ class TrainingBlockService extends ChangeNotifier {
   List<TrainingBlock> _trainingBlocks = [];
   List<TrainingBlock> get trainingBlocks => _trainingBlocks;
   
-  // Método auxiliar para obter o token de autenticação
   Future<String?> _getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(Constants.TOKEN_KEY);
   }
 
-  // --- Método para Criar um Novo Bloco de Treino ---
   Future<TrainingBlock> createTrainingBlock(TrainingBlockCreate newBlock) async {
     final token = await _getAccessToken();
     if (token == null) {
@@ -49,7 +47,6 @@ class TrainingBlockService extends ChangeNotifier {
     }
   }
 
-  // --- Método para Listar Blocos de Treino ---
   Future<List<TrainingBlock>> fetchTrainingBlocks({int skip = 0, int limit = 100}) async {
     final token = await _getAccessToken();
     if (token == null) {
@@ -75,7 +72,6 @@ class TrainingBlockService extends ChangeNotifier {
     }
   }
 
-  // --- Método para Obter um Bloco de Treino por ID ---
   Future<TrainingBlock> getTrainingBlockById(String id) async {
     final token = await _getAccessToken();
     if (token == null) {
@@ -100,7 +96,6 @@ class TrainingBlockService extends ChangeNotifier {
     }
   }
 
-  // --- Método para Atualizar um Bloco de Treino ---
   Future<TrainingBlock> updateTrainingBlock(String id, TrainingBlockUpdate updatedBlock) async {
     final token = await _getAccessToken();
     if (token == null) {
@@ -133,7 +128,6 @@ class TrainingBlockService extends ChangeNotifier {
     }
   }
 
-  // --- Método para Deletar um Bloco de Treino ---
   Future<void> deleteTrainingBlock(String id) async {
     final token = await _getAccessToken();
     if (token == null) {

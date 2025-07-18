@@ -16,10 +16,7 @@ class Exercise(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), default=datetime.now, onupdate=datetime.now)
 
-    # Relacionamentos (opcional, dependendo de como você quer acessar)
-    # Permite acessar os training_block_exercises associados a este exercício
     training_block_exercises = relationship("TrainingBlockExercise", back_populates="exercise")
-    # Permite acessar os exercise_logs associados a este exercício
     exercise_logs = relationship("ExerciseLog", back_populates="exercise")
 
     def __repr__(self):

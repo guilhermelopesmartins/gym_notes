@@ -7,8 +7,8 @@ import 'package:gym_notes/services/exercise_log_service.dart';
 class ExerciseLogFormScreen extends StatefulWidget {
   final String trainingBlockId;
   final String exerciseId;
-  final String exerciseName; // Para exibir no AppBar
-  final ExerciseLog? exerciseLog; // Opcional: para edição de um log existente
+  final String exerciseName; 
+  final ExerciseLog? exerciseLog; 
 
   const ExerciseLogFormScreen({
     super.key,
@@ -27,25 +27,22 @@ class _ExerciseLogFormScreenState extends State<ExerciseLogFormScreen> {
   final _notesController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
-  // Lista de controladores para os sets, dinâmicos
   final List<TextEditingController> _setControllers = [];
   final List<TextEditingController> _repsControllers = [];
   final List<TextEditingController> _weightControllers = [];
   final List<TextEditingController> _rpeControllers = [];
   final List<TextEditingController> _setNotesControllers = [];
-  final List<String> _unitSelections = []; // 'kg' ou 'lbs'
+  final List<String> _unitSelections = []; 
 
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    if (widget.exerciseLog != null) {
-      // Modo de edição: preenche os campos
+    if (widget.exerciseLog != null) {      
       _notesController.text = widget.exerciseLog!.notes ?? '';
       _selectedDate = widget.exerciseLog!.logDate;
 
-      // Preenche os sets existentes
       for (var setData in widget.exerciseLog!.setsRepsData) {
         _setControllers.add(TextEditingController(text: setData.set.toString()));
         _repsControllers.add(TextEditingController(text: setData.reps.toString()));
@@ -54,8 +51,7 @@ class _ExerciseLogFormScreenState extends State<ExerciseLogFormScreen> {
         _setNotesControllers.add(TextEditingController(text: setData.notes ?? ''));
         _unitSelections.add(setData.unit ?? 'kg');
       }
-    } else {
-      // Modo de criação: adiciona um set inicial vazio
+    } else {      
       _addSet();
     }
   }
@@ -78,7 +74,7 @@ class _ExerciseLogFormScreenState extends State<ExerciseLogFormScreen> {
       _weightControllers.add(TextEditingController());
       _rpeControllers.add(TextEditingController());
       _setNotesControllers.add(TextEditingController());
-      _unitSelections.add('kg'); // Padrão
+      _unitSelections.add('kg'); 
     });
   }
 
@@ -96,8 +92,7 @@ class _ExerciseLogFormScreenState extends State<ExerciseLogFormScreen> {
       _rpeControllers.removeAt(index);
       _setNotesControllers.removeAt(index);
       _unitSelections.removeAt(index);
-
-      // Reajusta os números dos sets
+      
       for (int i = 0; i < _setControllers.length; i++) {
         _setControllers[i].text = (i + 1).toString();
       }
@@ -122,8 +117,7 @@ class _ExerciseLogFormScreenState extends State<ExerciseLogFormScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-
-    // Coleta os dados de sets
+    
     final List<SetData> setsRepsData = [];
     for (int i = 0; i < _setControllers.length; i++) {
       if (_repsControllers[i].text.isNotEmpty && _weightControllers[i].text.isNotEmpty) {
@@ -173,7 +167,7 @@ class _ExerciseLogFormScreenState extends State<ExerciseLogFormScreen> {
           const SnackBar(content: Text('Log de exercício atualizado com sucesso!')),
         );
       }
-      Navigator.of(context).pop(true); // Retorna true para indicar sucesso e recarregar
+      Navigator.of(context).pop(true); 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao salvar log: ${e.toString().replaceFirst('Exception: ', '')}')),

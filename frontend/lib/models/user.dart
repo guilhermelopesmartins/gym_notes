@@ -1,14 +1,9 @@
 // lib/models/user.dart
 import 'package:json_annotation/json_annotation.dart';
-
-// Importe outros modelos que podem ser relacionados, se necessário
-// Por exemplo, se você quiser carregar TrainingBlocks ou ExerciseLogs diretamente com o usuário
 import 'package:gym_notes/models/training_block.dart';
 import 'package:gym_notes/models/exercise_log.dart';
+part 'user.g.dart'; 
 
-part 'user.g.dart'; // Parte gerada automaticamente pelo json_serializable
-
-// --- Modelo Principal do Usuário (Schemas de Saída como UserInDB ou UserInDBBase) ---
 @JsonSerializable()
 class User {
   final String id;
@@ -37,14 +32,11 @@ class User {
     this.exerciseLogs,
   });
 
-  // Factory constructor para desserialização JSON
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
-  // Método para serialização JSON
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
 
-// --- Modelo para Criação de Usuário (schemas.UserCreate do FastAPI) ---
 @JsonSerializable()
 class UserCreate {
   final String username;
@@ -64,11 +56,6 @@ class UserCreate {
   Map<String, dynamic> toJson() => _$UserCreateToJson(this);
 }
 
-// --- Modelo para Login de Usuário (schemas.UserLogin do FastAPI) ---
-// Note: OAuth2PasswordRequestForm no FastAPI espera 'username' e 'password' diretamente,
-// e não um JSON com esses campos. No Flutter, você geralmente enviará esses dados como
-// `application/x-www-form-urlencoded` ou como JSON para um endpoint que aceita BaseModel.
-// Vamos usar um BaseModel simples aqui, mas o serviço de Auth pode precisar de tratamento especial.
 @JsonSerializable()
 class UserLogin {
   final String username;
@@ -83,7 +70,6 @@ class UserLogin {
   Map<String, dynamic> toJson() => _$UserLoginToJson(this);
 }
 
-// --- Modelo para Atualização de Usuário (schemas.UserUpdate do FastAPI) ---
 @JsonSerializable()
 class UserUpdate {
   final String? username;

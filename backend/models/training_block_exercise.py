@@ -16,7 +16,6 @@ class TrainingBlockExercise(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.now)
     updated_at = Column(DateTime(timezone=True), default=datetime.now, onupdate=datetime.now)
 
-    # Relacionamentos para facilitar o acesso
     training_block = relationship("TrainingBlock", back_populates="block_exercises")
     exercise = relationship("Exercise", back_populates="training_block_exercises")
 

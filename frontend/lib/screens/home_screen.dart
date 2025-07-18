@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:gym_notes/services/auth_service.dart';
-import 'package:gym_notes/screens/auth/login_screen.dart'; // Para redirecionar no logout
+import 'package:gym_notes/screens/auth/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,13 +15,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchUserData(); // Tenta buscar os dados do usuário ao iniciar a tela
+    _fetchUserData();
   }
 
   Future<void> _fetchUserData() async {
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final user = await authService.getMe(); // Chama o getMe para obter dados do usuário
+      final user = await authService.getMe();
       if (user != null) {
         setState(() {
           _welcomeMessage = 'Bem-vindo, ${user.username}!';
@@ -29,12 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       print('Erro ao carregar dados do usuário na Home: $e');
-      // Se o token estiver expirado, getMe já fará o logout e o app será redirecionado
-      // ou mostre uma mensagem de erro.
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Não foi possível carregar seu perfil. Por favor, faça login novamente.')),
       );
-      Navigator.of(context).pushReplacementNamed('/login'); // Redireciona para o login
+      Navigator.of(context).pushReplacementNamed('/login');
     }
   }
 

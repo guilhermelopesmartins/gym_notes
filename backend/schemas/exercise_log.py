@@ -6,14 +6,12 @@ from schemas.exercise import ExerciseInDB
 from schemas.training_block import TrainingBlockInDB
 from schemas.user import UserInDBBase
 
-# Modelo para o JSONB de sets_reps_data
-# Definindo a estrutura esperada para cada set
 class SetData(BaseModel):
     set: int
     reps: int
     weight: float
     unit: Optional[str] = 'kg'
-    rpe: Optional[int] = Field(None, ge=1, le=10) # RPE de 1 a 10
+    rpe: Optional[int] = Field(None, ge=1, le=10) 
     notes: Optional[str] = None
 
 class ExerciseLogBase(BaseModel):
@@ -42,7 +40,6 @@ class ExerciseLogInDB(ExerciseLogBase):
     class Config:
         from_attributes = True
 
-# Schema com relacionamentos (para retorno da API com dados aninhados)
 class ExerciseLogWithDetails(ExerciseLogInDB):
     exercise: ExerciseInDB
     training_block: TrainingBlockInDB

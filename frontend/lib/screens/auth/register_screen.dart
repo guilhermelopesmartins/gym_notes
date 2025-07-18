@@ -17,20 +17,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>(); // Chave para validação do formulário
+  final _formKey = GlobalKey<FormState>(); 
   final ImagePicker _picker = ImagePicker();
-  File? _profileImage; // Para armazenar o arquivo de imagem selecionado
-  bool _isLoading = false; // Estado para mostrar indicador de carregamento
+  File? _profileImage; 
+  bool _isLoading = false; 
 
   Future<void> _pickImage() async {
   final pickedFile = await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
 
   if (pickedFile != null) {
     debugPrint('Caminho da imagem obtido pelo ImagePicker: ${pickedFile.path}');
-    try {
-      // Tenta criar o File
+    try { 
       final tempFile = File(pickedFile.path);
-      // Verifica se o arquivo realmente existe no caminho
       if (await tempFile.exists()) {
         debugPrint('Arquivo temporário existe: ${tempFile.path}');
         setState(() {
@@ -69,7 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registro bem-sucedido! Por favor, faça login.')),
         );
-        Navigator.of(context).pushReplacementNamed('/login'); // Redireciona para o login
+        Navigator.of(context).pushReplacementNamed('/login'); 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro no registro: ${e.toString().replaceFirst('Exception: ', '')}')),
@@ -94,7 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) {
-      return; // Não prossegue se o formulário for inválido
+      return; 
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
@@ -105,7 +103,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     setState(() {
-      _isLoading = true; // Ativa o indicador de carregamento
+      _isLoading = true; 
     });
 
     final authService = Provider.of<AuthService>(context, listen: false);
@@ -113,29 +111,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       final user = await authService.register(
         _usernameController.text,
-        _emailController.text, // Email será necessário para UserCreate
+        _emailController.text, 
         _passwordController.text,
       );
 
       if (user != null) {
-        // Registro bem-sucedido
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Registro bem-sucedido! Por favor, faça login.'),
             backgroundColor: Colors.green,
           ),
         );
-        // Redireciona para a tela de login
         Navigator.of(context).pushReplacementNamed('/login');
       }
     } catch (e) {
-      // Trata erros de registro (ex: nome de usuário/email já em uso)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro de registro: ${e.toString().replaceFirst('Exception: ', '')}')),
       );
     } finally {
       setState(() {
-        _isLoading = false; // Desativa o indicador de carregamento
+        _isLoading = false; 
       });
     }
   }
@@ -263,7 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacementNamed('/login'); // Volta para a tela de login
+                    Navigator.of(context).pushReplacementNamed('/login'); 
                   },
                   child: Text(
                     'Já tem uma conta? Faça login aqui.',

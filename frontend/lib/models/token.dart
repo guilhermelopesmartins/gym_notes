@@ -1,9 +1,8 @@
 // lib/models/token.dart
 import 'package:json_annotation/json_annotation.dart';
 
-part 'token.g.dart'; // Parte gerada automaticamente pelo json_serializable
+part 'token.g.dart';
 
-// --- Modelo Principal do Token (schemas.Token do FastAPI) ---
 @JsonSerializable()
 class Token {
   @JsonKey(name: 'access_token')
@@ -16,10 +15,8 @@ class Token {
     required this.tokenType,
   });
 
-  // Factory constructor para desserialização JSON
   factory Token.fromJson(Map<String, dynamic> json) => _$TokenFromJson(json);
 
-  // Método para serialização JSON (não é comum serializar Token para enviar, mas é bom ter)
   Map<String, dynamic> toJson() => _$TokenToJson(this);
 }
 
