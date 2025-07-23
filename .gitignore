@@ -1,0 +1,132 @@
+# ===============================================
+# GITIGNORE GLOBAL PARA PROJETO MULTIPLATAFORMA
+# ===============================================
+
+# -----------------------------------------------
+# Python Backend
+# -----------------------------------------------
+# Bytecode e caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Ambientes virtuais
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+*/bin/activate
+*/Scripts/activate
+
+# CPython específicos (como CPython-313)
+CPython-*/
+
+# Bancos de dados e logs (se não forem versionados)
+*.sqlite3
+*.db
+*.log
+
+# Arquivos de upload de usuário (se houver)
+/uploads/
+/media/
+
+# Variáveis de ambiente (dados sensíveis)
+.env
+.flaskenv
+
+# Arquivos de cobertura de teste
+.coverage
+.tox/
+htmlcov/
+
+# Outros
+pip-log.txt
+pip-delete-this-file.txt
+.pytest_cache/
+.mypy_cache/
+
+# -----------------------------------------------
+# Flutter Frontend (Android, iOS, Web, Desktop)
+# -----------------------------------------------
+# Build e compilação
+.dart_tool/
+.flutter-plugins-dependencies
+.flutter-plugins
+.packages
+build/
+ios/.symlinks/
+android/.gradle/
+android/local.properties
+android/key.properties
+# Mac/iOS specific
+ios/.bundle/
+ios/.flutter-plugins
+ios/.flutter-plugins-dependencies
+
+# Arquivos de IDEs e sistema
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+desktop/
+web/build/ # Se você não versiona o build web
+
+# Dependências de Pods (iOS)
+ios/Pods/
+ios/.ios-cmake/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+
+# Dependências de Gradle (Android)
+android/app/build/
+android/app/.cxx/
+android/app/src/main/assets/flutter_assets/ # Pode ser grande
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
+
+# Ficheiros de teste de instrumentação Android (gerados)
+/android/app/src/androidTest/java/ # Pode ser necessário se estiver gerando
+
+# -----------------------------------------------
+# Outros Arquivos Comuns e IDEs
+# -----------------------------------------------
+# Gerados por depuradores ou ferramentas de tempo de execução
+*.stackdump
+*.elf
+*.o
+*.out
+*.map
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+
+# Arquivos temporários e de swap
+*~
+*.bak
+*.swp
+*.tmp
+
+# Arquivos de editor
+.editorconfig
+.prettierrc
+.npmrc
+.nvmrc
+
+# Diretorios node (se houver js/ts no projeto)
+node_modules/
+
+# Logs e caches genéricos
+logs/
+*.log
+*.cache
+.cache/
+
+# ===============================================
